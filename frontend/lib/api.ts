@@ -73,15 +73,12 @@ export async function investigateAlert(alertId: string): Promise<InvestigationRe
 }
 
 export async function exportReport(
-  alertId: string,
-  reportMarkdown?: string
+  alertId: string
 ): Promise<{ report_markdown: string }> {
   return safeFetch<{ report_markdown: string }>(`${BASE_URL}/export-report`, {
     method: "POST",
     body: JSON.stringify({
       alert_id: alertId,
-      report_markdown: reportMarkdown,
-      format: "markdown",
     }),
   });
 }

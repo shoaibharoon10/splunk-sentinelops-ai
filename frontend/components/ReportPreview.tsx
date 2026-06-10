@@ -17,7 +17,7 @@ export default function ReportPreview({ alertId, reportMarkdown }: ReportPreview
     setErrorMsg(null);
     try {
       // API call to verify/get the export
-      const res = await exportReport(alertId, reportMarkdown);
+      const res = await exportReport(alertId);
       const markdownContent = res.report_markdown || reportMarkdown;
 
       // Create browser download
