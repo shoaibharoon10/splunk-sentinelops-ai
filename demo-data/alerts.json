@@ -1,0 +1,46 @@
+[
+  {
+    "alert_id": "alert-001",
+    "title": "Suspicious Login and Command Execution Cascade",
+    "severity": "Critical",
+    "source": "Splunk Core Alert Rules",
+    "user": "admin",
+    "host": "win-dc-01",
+    "source_ip": "185.21.44.10",
+    "timestamp": "2026-06-10T12:05:00Z",
+    "status": "New"
+  },
+  {
+    "alert_id": "alert-002",
+    "title": "Suspicious PowerShell Execution",
+    "severity": "High",
+    "source": "Sysmon Rules",
+    "user": "admin",
+    "host": "win-dc-01",
+    "source_ip": "185.21.44.10",
+    "timestamp": "2026-06-10T12:05:00Z",
+    "status": "New"
+  },
+  {
+    "alert_id": "alert-003",
+    "title": "Possible Data Exfiltration",
+    "severity": "High",
+    "source": "Palo Alto Firewall logs",
+    "user": "admin",
+    "host": "win-dc-01",
+    "source_ip": "10.0.0.5",
+    "timestamp": "2026-06-10T12:10:00Z",
+    "status": "New"
+  },
+  {
+    "alert_id": "alert-004",
+    "title": "Web Application Error Spike",
+    "severity": "Medium",
+    "source": "Nginx Access logs",
+    "user": "guest",
+    "host": "web-server-01",
+    "source_ip": "185.21.44.10",
+    "timestamp": "2026-06-10T11:52:00Z",
+    "status": "New"
+  }
+]

@@ -1,0 +1,6 @@
+_time,src_ip,endpoint,status_code,user_agent,response_time
+2026-06-10T11:50:00Z,192.168.10.15,/api/v1/users,200,Mozilla/5.0,24
+2026-06-10T11:51:00Z,192.168.10.15,/api/v1/dashboard,200,Mozilla/5.0,32
+2026-06-10T11:52:00Z,185.21.44.10,/api/admin/db_backup,500,Curl/7.68.0,4120
+2026-06-10T11:52:05Z,185.21.44.10,/api/admin/db_backup,500,Curl/7.68.0,3980
+2026-06-10T11:52:10Z,185.21.44.10,/api/admin/db_backup,500,Curl/7.68.0,4020

