@@ -574,3 +574,23 @@ Acceptance Criteria:
 * Executes client connection loops when active.
 Dependencies:
 * T012
+
+---
+
+## 32. MCP-ready Splunk App Assets
+
+### T039 — MCP-ready Splunk App Packaging
+Priority: P1
+Phase: Integration
+Files/Folders:
+* `splunk-app/SplunkSentinelOps/default/app.conf`
+* `splunk-app/SplunkSentinelOps/default/savedsearches.conf`
+* `splunk-app/SplunkSentinelOps/default/tools.conf`
+* `splunk-app/SplunkSentinelOps/default/tool_input_payload_signatures.json`
+* `splunk-app/SplunkSentinelOps/metadata/default.meta`
+* `splunk-app/SplunkSentinelOps/README.md`
+Description: Create lightweight, MCP-ready Splunk App configuration files mapping saved searches and tooling payload schemas.
+Acceptance Criteria:
+* Skeleton config files exist and contain appropriate parameters without hardcoded credentials.
+Dependencies:
+* T032

@@ -27,30 +27,24 @@ gantt
     Phase 2: Mock Agent Pipeline       :p2, after p1, 1
     
     section Frontend
-    Phase 3: Dashboard & Alerts List   :p3, after p2, 1
-    Phase 4: Workspace Triage UI       :p4, after p3, 1
+    Phase 2B: SOC Dashboard UI & Workspace :p2b, after p2, 1
     
-    section Integration
-    Phase 5: Splunk REST Connector     :p5, after p4, 1
-    Phase 6: AI Client Gateway         :p6, after p5, 1
-    Phase 7: Report & Actions State    :p7, after p6, 1
+    section Integration & MCP
+    Phase 3: Splunk REST & MCP Assets  :p3, after p2b, 1
+    
+    section AI Layer
+    Phase 4: AI Client Gateway         :p4, after p3, 1
     
     section Submission
-    Phase 8: MCP Client Abstraction    :p8, after p7, 1
-    Phase 9: README & Video Script     :p9, after p8, 1
-    Phase 10: Validation & Fixes       :p10, after p9, 1
+    Phase 5: README & Devpost Submission :p5, after p4, 1
 ```
 
 *   **Phase 1: Backend foundation and mock data (Day 1)**: Set up the FastAPI framework, write CSV seed log files in `demo-data/`, and establish the mock query service.
 *   **Phase 2: Mock agentic investigation pipeline (Day 1)**: Draft FastAPI routes, Pydantic schemas, and the 7-agent modules running in mock mode.
-*   **Phase 3: Frontend dashboard and alert UI (Day 2)**: Construct the Next.js page layout, sidebar navigation, and the alert table with severity colors.
-*   **Phase 4: Investigation UI with SPL, evidence, timeline, risk score, recommendations (Day 3)**: Complete the multi-column workspace layout showing timeline trees, risk gauges, and code boxes.
-*   **Phase 5: Splunk REST API integration (Day 4)**: Implement search dispatch and results fetching in `splunk_client.py`.
-*   **Phase 6: AI summary layer and mock AI fallback (Day 4)**: Interface Gemini and OpenAI clients; write robust prompt templates.
-*   **Phase 7: Report export and action management (Day 5)**: Complete the simulated recommendation approvals and markdown export endpoint.
-*   **Phase 8: MCP-ready abstraction (Day 5)**: Put together Splunk MCP hooks inside `mcp_client.py` for bonus points.
-*   **Phase 9: README, architecture, demo video, submission polish (Day 6)**: Finalize documentation, load scripts, and run video recording.
-*   **Phase 10: Testing and fixes (Day 6)**: Run integration checks and complete the submission checklist.
+*   **Phase 2B: Frontend dashboard and alert UI (Day 2-3)**: Construct the Next.js App Router workspace, dashboard metric cards, timeline streams, risk score gauges, and recommendations panel.
+*   **Phase 3: Real Splunk REST integration and MCP-ready assets (Day 4)**: Implement search job flow in `splunk_client.py`, create setup documents (`load_data_to_splunk.md`, `splunk_sample_queries.md`, `splunk_rest_test.md`), and build a lightweight MCP-ready Splunk App config folder.
+*   **Phase 4: AI summary layer and mock AI fallback (Day 5)**: Interface Gemini/OpenAI API gateways with secure prompt templates and fallback strategies.
+*   **Phase 5: Devpost, README, and final validation (Day 6)**: Finalize Devpost presentation, master README, record the 3-minute video, and run final end-to-end checks.
 
 ---
 
@@ -64,10 +58,11 @@ gantt
 | `backend/app/routes/alerts.py` | Alert listing routes | Phase 2 | Mock Data | `GET /alerts` returns 100% valid JSON payload |
 | `backend/app/routes/investigate.py` | Runs investigation pipeline | Phase 2 | Agent schemas | Returns mock payload matching Pydantic response contract |
 | `backend/app/agents/*.py` | The 7 security agents | Phase 2 | Pluggable models | Each class performs designated parsing, planning, or scoring task |
-| `frontend/app/page.tsx` | Dashboard view | Phase 3 | Next.js, TS | Static page displays grids, counters, and mock connection status |
-| `frontend/app/investigate/[alert_id]/page.tsx` | Workspace detail view | Phase 4 | API Client | Dynamically fetches investigation results and displays components |
-| `backend/app/services/splunk_client.py` | Communicates with Splunk | Phase 5 | requests | Polling logic parses search status SID and collects events |
-| `backend/app/services/ai_client.py` | Calls LLM APIs | Phase 6 | openai/google-generativeai | Converts structured prompts to Pydantic objects or uses mock templates |
+| `frontend/app/page.tsx` | Dashboard view | Phase 2B | Next.js, TS | Static page displays grids, counters, and mock connection status |
+| `frontend/app/alerts/[alertId]/page.tsx` | Workspace detail view | Phase 2B | API Client | Dynamically fetches investigation results and displays components |
+| `backend/app/services/splunk_client.py` | Communicates with Splunk | Phase 3 | requests | Polling logic parses search status SID and collects events |
+| `splunk-app/SplunkSentinelOps/*` | MCP-ready Splunk app skeleton | Phase 3 | None | Formulates saved searches and tools.conf mappings |
+| `backend/app/services/ai_client.py` | Calls LLM APIs | Phase 4 | openai/google-generativeai | Converts structured prompts to Pydantic objects or uses mock templates |
 
 ---
 
@@ -102,14 +97,24 @@ gantt
     *   `sentinelops:auth` -> Authentication logs.
     *   `sentinelops:endpoint` -> Sysmon/Process creation command lines.
     *   `sentinelops:firewall` -> Outbound socket volumes.
+    *   `sentinelops:web` -> Web request traffic and status code anomalies.
 *   **Splunk Client Connection**:
     ```python
     # Connection logic configuration parameters
-    SPLUNK_URL = os.getenv("SPLUNK_URL")
-    SPLUNK_TOKEN = os.getenv("SPLUNK_TOKEN")
+    SPLUNK_HOST = os.getenv("SPLUNK_HOST", "https://localhost:8089")
+    SPLUNK_USERNAME = os.getenv("SPLUNK_USERNAME", "admin")
+    SPLUNK_PASSWORD = os.getenv("SPLUNK_PASSWORD", "")
+    SPLUNK_TOKEN = os.getenv("SPLUNK_TOKEN", "")
     SPLUNK_VERIFY_SSL = os.getenv("SPLUNK_VERIFY_SSL", "False").lower() == "true"
     ```
-*   **Mock Fallback**: If connection fails or URL parameters are blank, the client routes search commands to the CSV engine, logging `Splunk client down - executing search via Mock Client`.
+*   **Mock Fallback**: If connection fails or credentials parameters are blank, the client routes search commands to the CSV engine, logging `Splunk client offline - executing search via Mock Client`.
+*   **MCP-ready Splunk App Assets (`splunk-app/SplunkSentinelOps/`)**:
+    - `default/app.conf`: App package configurations (ID, author, version).
+    - `default/savedsearches.conf`: Configures pre-defined hunts matching the four target indexes (`SentinelOps Auth/Endpoint/Firewall/Web Investigation`).
+    - `default/tools.conf`: Configures MCP-ready security threat analysis tools exposed through the Splunk MCP Server.
+    - `default/tool_input_payload_signatures.json`: Maps standard JSON Schema validation inputs (user, host, src_ip, earliest, latest, threshold_bytes).
+    - `metadata/default.meta`: Role permissions for searches and tools.
+    - `README.md`: Explains integration of SentinelOps tools into Splunk MCP Server.
 
 ---
 
