@@ -1,0 +1,5 @@
+# Share all default assets globally
+
+[]
+access = read : [ * ], write : [ admin ]
+export = system

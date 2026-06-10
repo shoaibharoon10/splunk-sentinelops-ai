@@ -12,6 +12,11 @@ export default function SettingsPage() {
   const [splunkMode, setSplunkMode] = useState("mock");
   const [splunkServer, setSplunkServer] = useState("localhost:8089");
   const [indicesStatus, setIndicesStatus] = useState<Record<string, number>>({});
+  const [splunkConfigured, setSplunkConfigured] = useState(false);
+  const [splunkConnected, setSplunkConnected] = useState(false);
+  const [splunkIndex, setSplunkIndex] = useState("sentinelops");
+  const [splunkAuthMethod, setSplunkAuthMethod] = useState("None");
+  const [splunkMessage, setSplunkMessage] = useState("");
 
   const loadDiagnostics = async (isManual = false) => {
     if (isManual) {
@@ -22,9 +27,14 @@ export default function SettingsPage() {
       const [health, splunk] = await Promise.all([getHealth(), getSplunkStatus()]);
       setBackendMode(health.mode);
       setAiMode(health.ai_provider);
-      setSplunkMode(splunk.connected ? "Production REST API" : "Mock (CSV Fallback)");
+      setSplunkMode(splunk.mode || (splunk.connected ? "real" : "mock"));
       setSplunkServer(`${splunk.host}:${splunk.port}`);
       setIndicesStatus(splunk.indices || {});
+      setSplunkConfigured(!!splunk.configured);
+      setSplunkConnected(splunk.connected);
+      setSplunkIndex(splunk.index || "sentinelops");
+      setSplunkAuthMethod(splunk.auth_method || "None");
+      setSplunkMessage(splunk.message || splunk.error || "");
     } catch (err) {
       console.error("Failed to load settings diagnostics:", err);
     } finally {
@@ -39,9 +49,14 @@ export default function SettingsPage() {
         if (active) {
           setBackendMode(health.mode);
           setAiMode(health.ai_provider);
-          setSplunkMode(splunk.connected ? "Production REST API" : "Mock (CSV Fallback)");
+          setSplunkMode(splunk.mode || (splunk.connected ? "real" : "mock"));
           setSplunkServer(`${splunk.host}:${splunk.port}`);
           setIndicesStatus(splunk.indices || {});
+          setSplunkConfigured(!!splunk.configured);
+          setSplunkConnected(splunk.connected);
+          setSplunkIndex(splunk.index || "sentinelops");
+          setSplunkAuthMethod(splunk.auth_method || "None");
+          setSplunkMessage(splunk.message || splunk.error || "");
           setLoading(false);
         }
       })
@@ -126,10 +141,47 @@ export default function SettingsPage() {
           <div className="space-y-3 text-xs pt-1">
             <div className="flex flex-col space-y-1">
               <span className="text-zinc-500 font-semibold text-[10px] uppercase">Splunk REST Server Address</span>
-              <span className="font-mono text-zinc-300 bg-zinc-900 px-2 py-1 rounded border border-zinc-850 block w-full">
+              <span className="font-mono text-zinc-300 bg-zinc-900 px-2 py-1 rounded border border-zinc-850 block w-full select-all">
                 {splunkServer}
               </span>
             </div>
+
+            <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+              <span className="text-zinc-400 font-medium">Configured State</span>
+              <span className={`font-mono font-bold px-2 py-0.5 rounded border ${splunkConfigured ? "text-emerald-400 bg-emerald-950/20 border-emerald-900" : "text-amber-400 bg-amber-950/20 border-amber-900"}`}>
+                {splunkConfigured ? "CONFIGURED" : "NOT CONFIGURED"}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+              <span className="text-zinc-400 font-medium">Active Connection</span>
+              <span className={`font-mono font-bold px-2 py-0.5 rounded border ${splunkConnected ? "text-emerald-400 bg-emerald-950/20 border-emerald-900" : "text-rose-400 bg-rose-950/20 border-rose-900"}`}>
+                {splunkConnected ? "CONNECTED" : "OFFLINE"}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+              <span className="text-zinc-400 font-medium">Target Index</span>
+              <span className="font-mono font-bold text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
+                {splunkIndex}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+              <span className="text-zinc-400 font-medium">Authentication</span>
+              <span className="font-mono font-bold text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
+                {splunkAuthMethod}
+              </span>
+            </div>
+
+            {splunkMessage && (
+              <div className="flex flex-col space-y-1 py-1.5">
+                <span className="text-zinc-500 font-semibold text-[10px] uppercase">Status Message</span>
+                <p className="text-[11px] text-zinc-400 font-mono bg-zinc-900 p-2 rounded border border-zinc-850 leading-relaxed whitespace-pre-wrap">
+                  {splunkMessage}
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2 pt-2">
               <span className="text-zinc-500 font-semibold text-[10px] uppercase block">

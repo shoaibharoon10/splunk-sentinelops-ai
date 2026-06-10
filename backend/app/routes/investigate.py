@@ -53,7 +53,7 @@ def investigate_alert(req: InvestigationRequest):
     spl_queries = spl_planner.run(context)
 
     # 4. Run Evidence Collector Agent
-    evidence = evidence_collector.run(context)
+    evidence = evidence_collector.run(context, spl_queries=spl_queries)
 
     # 5. Run Risk Scorer Agent
     scoring_result = risk_scorer.run(evidence, context)
@@ -117,7 +117,7 @@ def investigate_alert(req: InvestigationRequest):
         recommendations=recommendations,
         human_approval_required=hitl_required,
         report_markdown=report_markdown,
-        mode="mock",
+        mode=splunk_client.mode,
         splunk_status=splunk_connected_str,
         ai_status=ai_status_str
     )
@@ -137,7 +137,7 @@ def export_report(req: ReportExportRequest):
     # If markdown was not supplied, regenerate using mock pipeline
     context = alert_parser.run(alert)
     spl_queries = spl_planner.run(context)
-    evidence = evidence_collector.run(context)
+    evidence = evidence_collector.run(context, spl_queries=spl_queries)
     scoring_result = risk_scorer.run(evidence, context)
     timeline = timeline_builder.run(evidence)
     recommendations = recommender.run(req.alert_id, context, scoring_result["risk_score"])
@@ -181,7 +181,12 @@ def get_splunk_status():
         host=status["host"],
         port=status["port"],
         indices=status["indices"],
-        error=status["error"]
+        error=status["error"],
+        mode=status.get("mode", "mock"),
+        configured=status.get("configured", False),
+        index=status.get("index", "sentinelops"),
+        auth_method=status.get("auth_method", "None"),
+        message=status.get("message", "")
     )
 
 @router.post("/alerts/{alert_id}/actions/{recommendation_id}")

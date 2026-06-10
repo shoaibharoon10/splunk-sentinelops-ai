@@ -68,6 +68,11 @@ class SplunkStatus(BaseModel):
     port: int
     indices: dict
     error: Optional[str] = None
+    mode: str
+    configured: bool
+    index: str
+    auth_method: str
+    message: str
 
 class ReportExportRequest(BaseModel):
     alert_id: str

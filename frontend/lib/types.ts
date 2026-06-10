@@ -68,6 +68,11 @@ export interface SplunkStatus {
   port: number;
   indices: Record<string, number>;
   error: string | null;
+  mode?: string;
+  configured?: boolean;
+  index?: string;
+  auth_method?: string;
+  message?: string;
 }
 
 export interface HealthResponse {

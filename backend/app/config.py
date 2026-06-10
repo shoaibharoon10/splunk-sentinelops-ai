@@ -16,6 +16,8 @@ SPLUNK_PASSWORD = os.getenv("SPLUNK_PASSWORD", "")
 SPLUNK_TOKEN = os.getenv("SPLUNK_TOKEN", "")
 SPLUNK_INDEX = os.getenv("SPLUNK_INDEX", "sentinelops")
 SPLUNK_VERIFY_SSL = os.getenv("SPLUNK_VERIFY_SSL", "false").lower() == "true"
+SPLUNK_SEARCH_TIMEOUT_SECONDS = int(os.getenv("SPLUNK_SEARCH_TIMEOUT_SECONDS", "30"))
+SPLUNK_POLL_INTERVAL_SECONDS = float(os.getenv("SPLUNK_POLL_INTERVAL_SECONDS", "1"))
 
 # AI configurations
 AI_PROVIDER = os.getenv("AI_PROVIDER", "mock").lower()

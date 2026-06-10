@@ -1,0 +1,63 @@
+{
+  "sentinelops_auth_investigation": {
+    "type": "object",
+    "properties": {
+      "user": {
+        "type": "string",
+        "description": "The target username being audited."
+      },
+      "src_ip": {
+        "type": "string",
+        "description": "The source IP address of the login requests."
+      }
+    },
+    "required": ["user", "src_ip"]
+  },
+  "sentinelops_endpoint_investigation": {
+    "type": "object",
+    "properties": {
+      "host": {
+        "type": "string",
+        "description": "The hostname of the system being audited."
+      }
+    },
+    "required": ["host"]
+  },
+  "sentinelops_firewall_exfiltration": {
+    "type": "object",
+    "properties": {
+      "host": {
+        "type": "string",
+        "description": "The hostname of the system being audited."
+      },
+      "threshold_bytes": {
+        "type": "integer",
+        "description": "The exfiltration threshold in bytes (e.g. 50000000)."
+      }
+    },
+    "required": ["host"]
+  },
+  "sentinelops_web_anomaly": {
+    "type": "object",
+    "properties": {
+      "src_ip": {
+        "type": "string",
+        "description": "The source IP address of the web request traffic."
+      }
+    },
+    "required": ["src_ip"]
+  },
+  "sentinelops_full_investigation_summary": {
+    "type": "object",
+    "properties": {
+      "earliest": {
+        "type": "string",
+        "description": "The earliest search bound time (e.g., -24h, 0)."
+      },
+      "latest": {
+        "type": "string",
+        "description": "The latest search bound time (e.g., now, @d)."
+      }
+    }
+  }
+}

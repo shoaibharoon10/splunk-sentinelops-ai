@@ -1,11 +1,90 @@
 from typing import Dict, Any, List
+from app import config
 from app.services import mock_data
+from app.services.splunk_client import SplunkClient
 
 class EvidenceCollectorAgent:
-    def run(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def __init__(self):
+        self.splunk_client = SplunkClient()
+
+    def run(self, context: Dict[str, Any], spl_queries: List[Dict[str, str]] = None) -> List[Dict[str, Any]]:
         """
         Gathers raw logs matching investigation criteria from mock_data or Splunk Enterprise.
         """
+        # If in real mode and queries are provided, query real Splunk
+        if config.SPLUNK_MODE == "real" and spl_queries:
+            evidence = []
+            status = self.splunk_client.get_status()
+            
+            # If not connected, report connection error cleanly
+            if not status["connected"]:
+                evidence.append({
+                    "source": "sentinelops:splunk:offline",
+                    "description": "Splunk connection error: Splunk Enterprise is currently offline or unreachable.",
+                    "raw_log": f"Failed to connect to Splunk Enterprise REST API at {self.splunk_client.host}.\nError details: {status.get('error', 'Unknown Error')}\nFallback logs: Check that your Splunk instance is running and credentials in backend/.env are correct."
+                })
+                return evidence
+
+            for q_item in spl_queries:
+                description = q_item.get("description", "Search query execution")
+                query_str = q_item.get("query")
+                
+                # Derive sourcetype / source classification
+                query_lower = query_str.lower()
+                desc_lower = description.lower()
+                if "auth" in query_lower or "auth" in desc_lower:
+                    source = "sentinelops:auth"
+                elif "endpoint" in query_lower or "endpoint" in desc_lower:
+                    source = "sentinelops:endpoint"
+                elif "firewall" in query_lower or "firewall" in desc_lower:
+                    source = "sentinelops:firewall"
+                elif "web" in query_lower or "web" in desc_lower:
+                    source = "sentinelops:web"
+                else:
+                    source = "sentinelops:search"
+
+                try:
+                    results = self.splunk_client.run_search(query_str)
+                    if results:
+                        formatted_rows = []
+                        for row in results:
+                            # Format row as time user=... src_ip=...
+                            t_val = row.get("_time", row.get("time", ""))
+                            row_parts = []
+                            if t_val:
+                                row_parts.append(str(t_val))
+                            for k, v in row.items():
+                                if k.startswith("_") and k != "_time":
+                                    continue
+                                if k in ["time", "_time"]:
+                                    continue
+                                row_parts.append(f"{k}={v}")
+                            formatted_rows.append(" ".join(row_parts))
+                        
+                        raw_sample = "\n".join(formatted_rows[:10])
+                        if len(formatted_rows) > 10:
+                            raw_sample += f"\n... [{len(formatted_rows) - 10} more events]"
+
+                        evidence.append({
+                            "source": source,
+                            "description": f"Splunk Query Audit ({description}): Successfully retrieved {len(results)} events from Splunk.",
+                            "raw_log": raw_sample
+                        })
+                    else:
+                        evidence.append({
+                            "source": f"{source}:empty",
+                            "description": f"Splunk Query Audit ({description}): No events matched search criteria in Splunk.",
+                            "raw_log": f"SPL: {query_str}\nStatus: Query succeeded but returned 0 events."
+                        })
+                except Exception as e:
+                    evidence.append({
+                        "source": f"{source}:error",
+                        "description": f"Splunk Query Audit ({description}): Error executing query against Splunk REST API.",
+                        "raw_log": f"SPL: {query_str}\nError: {str(e)}"
+                    })
+            return evidence
+
+        # Mock fallback (CSV dataset query logic)
         user = context.get("user")
         host = context.get("host")
         src_ip = context.get("src_ip")
