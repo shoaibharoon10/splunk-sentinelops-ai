@@ -55,3 +55,23 @@ Checks HTTP status codes and endpoint hit counts to locate spikes in server erro
 index=sentinelops sourcetype="sentinelops:web"
 | stats count by status_code endpoint
 ```
+
+---
+
+## 7. CSV Host Ingestion Mapping (extracted_host vs host)
+> [!NOTE]
+> During CSV data uploads, Splunk reserves the default `host` field for the ingestion host/machine name (e.g. `ShoaibDESKTOP-...`).
+> The original hostname parsed from the CSV headers is indexed under the field `extracted_host` (e.g. `win-dc-01`).
+> SentinelOps SPL queries support checking both fields by wrapping filters like `(extracted_host="win-dc-01" OR host="win-dc-01")`.
+
+### Verify Endpoint Events by Extracted Host
+```spl
+index=sentinelops sourcetype="sentinelops:endpoint" extracted_host="win-dc-01"
+```
+
+### Verify Firewall Events by Extracted Host
+```spl
+index=sentinelops sourcetype="sentinelops:firewall" extracted_host="win-dc-01"
+| where bytes_out > 50000000
+```
+

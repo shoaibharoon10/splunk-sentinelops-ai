@@ -1,3 +1,8 @@
+import os
+os.environ["SPLUNK_MODE"] = "mock"
+os.environ["APP_MODE"] = "mock"
+os.environ["AI_MODE"] = "mock"
+
 from fastapi.testclient import TestClient
 from app.main import app
 
@@ -69,3 +74,30 @@ def test_approve_recommendation():
     data_inv = response_inv.json()
     rec = next(r for r in data_inv["recommendations"] if r["id"] == "rec-001")
     assert rec["status"] == "approved"
+
+def test_splunk_field_mapping_and_normalization():
+    # 1. Verify SPL query planner generated queries contain extracted_host
+    from app.agents.spl_query_planner import SPLQueryPlannerAgent
+    planner = SPLQueryPlannerAgent()
+    context = {"host": "win-dc-01", "user": "admin", "src_ip": "185.21.44.10", "alert_id": "alert-001"}
+    queries = planner.run(context)
+    
+    endpoint_query = next(q for q in queries if "endpoint" in q["query"].lower())
+    firewall_query = next(q for q in queries if "firewall" in q["query"].lower())
+    
+    assert "extracted_host" in endpoint_query["query"]
+    assert "extracted_host" in firewall_query["query"]
+
+    # 2. Verify evidence collector formats extracted_host correctly
+    from app.agents.evidence_collector import format_real_splunk_row
+    row_low = {
+        "_time": "2026-06-11T12:00:00Z",
+        "extracted_host": "win-dc-01",
+        "host": "ShoaibDESKTOP-I26TI8K",
+        "process_name": "whoami.exe",
+        "command_line": "whoami /priv",
+        "severity": "low"
+    }
+    row_str_low = format_real_splunk_row("sentinelops:endpoint", row_low, context)
+    assert "host=win-dc-01" in row_str_low
+    assert "host=ShoaibDESKTOP" not in row_str_low

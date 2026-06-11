@@ -13,15 +13,15 @@ class SPLQueryPlannerAgent:
         queries = [
             {
                 "description": "Retrieve authentication attempts for target user and source IP",
-                "query": f'index=sentinelops sourcetype="sentinelops:auth" user="{user}" src_ip="{src_ip}" | table _time, user, src_ip, action, status, host, country | sort _time'
+                "query": f'index=sentinelops sourcetype="sentinelops:auth" user="{user}" src_ip="{src_ip}" | table _time, user, src_ip, action, status, extracted_host, host, country | sort _time'
             },
             {
                 "description": "Inspect process execution command lines and execution hierarchies on target host",
-                "query": f'index=sentinelops sourcetype="sentinelops:endpoint" host="{host}" | table _time, host, user, process_name, command_line, parent_process, severity | sort _time'
+                "query": f'index=sentinelops sourcetype="sentinelops:endpoint" (extracted_host="{host}" OR host="{host}") | table _time, extracted_host, host, user, process_name, command_line, parent_process, severity | sort _time'
             },
             {
                 "description": "Correlate firewall socket egress events and outbound network byte volume",
-                "query": f'index=sentinelops sourcetype="sentinelops:firewall" host="{host}" | table _time, src_ip, dest_ip, dest_port, action, bytes_out, host | sort _time'
+                "query": f'index=sentinelops sourcetype="sentinelops:firewall" (extracted_host="{host}" OR host="{host}") | table _time, src_ip, dest_ip, dest_port, action, bytes_out, extracted_host, host | sort _time'
             }
         ]
         
