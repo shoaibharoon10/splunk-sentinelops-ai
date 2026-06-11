@@ -266,3 +266,27 @@ This sprint focuses on high-impact refinements to boost the project's winning po
 - Full Splunk SDK agent runtime (use REST API)
 - Private-preview Splunk Agent Builder dependency
 
+---
+
+## 13. Bonus Sprint: Live MCP Server and Hosted Models
+
+This bonus sprint outlines a path for integrating live Model Context Protocol (MCP) server endpoints and Splunk Hosted Models, pre-conditioned on verifying the 10GB Splunk Developer License without breaking standard REST API capabilities.
+
+### Prerequisites: Splunk Developer License Ingestion
+- Download the 10GB developer personal license file (valid until Dec 07, 2026).
+- Install license in Splunk Web Settings (Licensing → Add license → Choose file).
+- Restart Splunk Enterprise.
+- Re-validate the existing REST investigation demo to ensure zero regressions. Do not start coding bonus integrations until verification is complete.
+
+### Time-boxed Decision Gates
+1. **MCP Gate 1: Server and Token (Max 3 hrs)**: Install Splunk MCP Server app and generate token. If token generation fails, stop and document as future-ready.
+2. **MCP Gate 2: Tool Discovery (Max 4 hrs)**: Query MCP endpoint to discover SentinelOps app searches. If returns errors, stop and fall back to Splunk REST client.
+3. **MCP Gate 3: Integration (Max 4 hrs)**: Complete backend MCP query forwarding. If fails to execute, stop and fall back to REST.
+4. **Hosted Models Gate 1: Access (Max 2 hrs)**: Check endpoint authorization response. If access is denied, stop and document as future-ready.
+5. **Hosted Models Gate 2: Provider Integration (Max 6 hrs)**: Implement and format Splunk AI Toolkit narrative responses. If fails, stop and fall back to mock/Gemini/OpenAI.
+
+### Proposed Architectures & Fallbacks
+- **MCP Client**: Expose parameters `SPLUNK_MCP_URL` and `SPLUNK_MCP_TOKEN`. Route searches through MCP tool inputs, falling back cleanly to the raw Splunk REST API (`splunk_client.py`) on network failures or schema errors.
+- **Hosted Models Client**: Expose provider selection `AI_MODE=splunk_hosted`. Query Splunk Cloud AI Toolkit or Cisco Deep Time Series models, falling back cleanly to mock or API gateways (OpenAI/Gemini) on any error.
+
+

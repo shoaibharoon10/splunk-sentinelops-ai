@@ -663,3 +663,76 @@ Acceptance Criteria:
 Dependencies:
 * T037
 
+---
+
+## 34. Bonus Sprint: Live MCP Server and Hosted Models
+
+### T045 — Ingest and Verify Splunk Developer License
+Priority: P0
+Phase: Bonus Sprint (Prerequisite)
+Files/Folders:
+* None
+Description: Install the 10GB Splunk Developer License file in Splunk Web, restart Splunk, verify licensing status, and re-run all mock and real REST API investigation tests to ensure zero regressions. Do not write any code for MCP or Hosted Models until this license verification completes.
+Acceptance Criteria:
+* 10GB license verified as active in licensing dashboard.
+* REST status connected=True.
+* `/investigate` for `alert-001` succeeds with risk score 100.
+Dependencies:
+* None
+
+### T046 — Implement Live MCP Client with Fallback
+Priority: P2
+Phase: Bonus Sprint (Live MCP Server)
+Files/Folders:
+* `backend/app/services/mcp_client.py`
+* `backend/app/config.py`
+* `backend/app/routes/investigate.py`
+Description: Write an MCP client wrapper that queries the Splunk MCP Server API and triggers searches. Map tool calls dynamically, and ensure failures route directly to standard Splunk REST API search functions.
+Acceptance Criteria:
+* Code parses `SPLUNK_MCP_URL` and `SPLUNK_MCP_TOKEN`.
+* Discovers tool inputs and redirects queries.
+* Gracefully redirects to `splunk_client.py` if the server is offline or fails.
+Dependencies:
+* T045, T043
+
+### T047 — Implement Splunk Hosted Models Provider Branch
+Priority: P2
+Phase: Bonus Sprint (Hosted Models)
+Files/Folders:
+* `backend/app/services/ai_client.py`
+* `backend/app/config.py`
+Description: Create an API provider connector for Splunk Cloud AI Toolkit or Cisco Deep Time Series models. Implement error and timeout fallbacks that route execution to OpenAI/Gemini or mock templates.
+Acceptance Criteria:
+* `AI_MODE=splunk_hosted` queries the target endpoint.
+* Gracefully falls back to secondary cloud models or mock narratives on rate limits or failures.
+Dependencies:
+* T045
+
+### T048 — Update and Verify Submission Documentation
+Priority: P1
+Phase: Bonus Sprint (Documentation & Compliance)
+Files/Folders:
+* `README.md`
+* `submission/devpost-description.md`
+* `submission/demo-video-script.md`
+* `docs/architecture-diagram.md`
+* `splunk-app/SplunkSentinelOps/README.md`
+* `docs/appinspect-notes.md`
+Description: Refresh documentation files to record active live integration findings for the MCP Server and Hosted Models. Label skipped components as future-ready.
+Acceptance Criteria:
+* All claims align with live verification results.
+Dependencies:
+* T046, T047
+
+### T049 — Run Final Verification Compliance Checklist
+Priority: P0
+Phase: Bonus Sprint (QA Verification)
+Files/Folders:
+* `submission/final-checklist.md`
+Description: Run end-to-end regression tests to verify that new bonus variables do not impact zero-config onboarding or stable REST modes.
+Acceptance Criteria:
+* All tests pass, git status is clean, and no secrets are committed.
+Dependencies:
+* T048
+
+
