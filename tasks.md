@@ -594,3 +594,72 @@ Acceptance Criteria:
 * Skeleton config files exist and contain appropriate parameters without hardcoded credentials.
 Dependencies:
 * T032
+
+---
+
+## 33. Final Winning Polish Sprint
+
+### T040 — Implement Safe Optional AI Gateway
+Priority: P0
+Phase: Final Winning Polish Sprint (Phase 4A)
+Files/Folders:
+* `backend/app/services/ai_client.py`
+* `backend/.env.example`
+Description: Implement pluggable OpenAI and Gemini gateways with fallback routines. If keys are missing, the provider fails, or a request times out (max 20 seconds), fall back to the mock AI templates. Ensure the AI only affects explanation and reporting text; it must not change the deterministic risk score or execute response actions.
+Acceptance Criteria:
+* API responses fall back gracefully to mock templates when keys are absent or invalid.
+* Gateway does not modify the deterministic risk score (capping at 100).
+* Simulated actions (Approve/Reject) are unaffected by AI client failures.
+* No credentials/keys are exposed to frontend or API responses.
+Dependencies:
+* T013
+
+### T041 — Create Developer Tools and AppInspect Notes
+Priority: P1
+Phase: Final Winning Polish Sprint (Phase 4B)
+Files/Folders:
+* `docs/appinspect-notes.md`
+Description: Write a document detailing that the project includes an MCP-ready Splunk App skeleton. Explain that it is hackathon-ready, not Splunkbase-certified, and detail what AppInspect check represents and how future development packages/certifies it.
+Acceptance Criteria:
+* File `docs/appinspect-notes.md` is created and describes Splunkbase packaging, AppInspect requirements, and developer-tool alignment.
+Dependencies:
+* None
+
+### T042 — MCP Documentation Polish
+Priority: P1
+Phase: Final Winning Polish Sprint (Phase 4C)
+Files/Folders:
+* `README.md`
+* `submission/devpost-description.md`
+* `splunk-app/SplunkSentinelOps/README.md`
+* `docs/architecture-diagram.md`
+Description: Update references to clarify that the live integration uses the Splunk REST API, while the MCP-ready app configuration assets exist to support future Splunk MCP Server integration. Do not claim a live MCP server is running unless implemented.
+Acceptance Criteria:
+* Clarifications are accurately reflected across all target files.
+* Text aligns with the Best Use of Splunk MCP Server bonus story.
+Dependencies:
+* T033, T034, T036
+
+### T043 — Assess Live MCP Server Setup Decision Gate
+Priority: P2
+Phase: Final Winning Polish Sprint (Phase 4D)
+Files/Folders:
+* None
+Description: Determine if running a live Splunk MCP Server can be accomplished safely and quickly. Skip if it is too time-consuming, and document as future-ready.
+Acceptance Criteria:
+* Decision gate is resolved and documented.
+Dependencies:
+* T038
+
+### T044 — Perform Final Compliance and QA Checklist
+Priority: P0
+Phase: Final Winning Polish Sprint (Phase 4E)
+Files/Folders:
+* `submission/final-checklist.md`
+* `submission/screenshots-checklist.md`
+Description: Execute the final QA checks verifying that the mock mode is zero-config, the real Splunk REST integration works, fallbacks are robust, and no secrets are committed. Note that screenshots and video recording must only be captured *after* this sprint.
+Acceptance Criteria:
+* All QA checklist items are ticked off and verified.
+Dependencies:
+* T037
+

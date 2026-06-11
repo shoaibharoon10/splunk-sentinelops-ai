@@ -193,3 +193,76 @@ Implementation is complete when:
 3.  The frontend is styled as a premium dashboard.
 4.  All documentation files in the repository structure are fully written and committed.
 5.  No secret tokens are checked in.
+
+---
+
+## 12. Final Winning Polish Sprint
+
+This sprint focuses on high-impact refinements to boost the project's winning potential while ensuring a bulletproof, zero-dependency demo.
+
+### Phase 4A: AI Gateway (P0)
+- **Status**: Default runs on `AI_MODE=mock`.
+- **Additions**: Pluggable support for `AI_MODE=openai` and `AI_MODE=gemini` with robust error and timeout handling.
+- **Resilient Fallback Rules**:
+  - If keys are missing, provider fails, or a request times out (max 20s), the system must fall back to the mock AI generator without breaking.
+  - LLM integration must *only* enhance explanations, summaries, and executive reports. It must *not* change deterministic risk scores, nor approve or execute actions.
+  - Ensure zero secrets are exposed to the frontend or API JSON responses.
+- **Planned Environment Settings**:
+  ```ini
+  AI_MODE=mock
+  OPENAI_API_KEY=
+  OPENAI_MODEL=gpt-4o-mini
+  GEMINI_API_KEY=
+  GEMINI_MODEL=gemini-1.5-flash
+  AI_REQUEST_TIMEOUT_SECONDS=20
+  ```
+
+### Phase 4B: Developer Tools / AppInspect Documentation (P1)
+- **Goal**: Create [docs/appinspect-notes.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/appinspect-notes.md) to document developer tool alignment.
+- **Required Content**:
+  - Explain that the project includes a lightweight, MCP-ready Splunk app skeleton.
+  - Clarify it is a hackathon proof-of-concept, not Splunkbase-certified.
+  - State that AppInspect has not been run or claimed as passed unless actually executed.
+  - Detail future work: AppInspect validation, manifest metadata, icons, permissions, and Splunkbase listing polish.
+  - Explain the significance of AppInspect for aligning with Splunk developer tools.
+
+### Phase 4C: MCP Documentation Polish (P1)
+- **Goal**: Update existing documents to clarify the exact state of live integration versus MCP-ready assets.
+- **Target Files**:
+  - [README.md](file:///g:/DevHack/Splunk_SentinelOps_AI/README.md)
+  - [submission/devpost-description.md](file:///g:/DevHack/Splunk_SentinelOps_AI/submission/devpost-description.md)
+  - [splunk-app/SplunkSentinelOps/README.md](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/README.md)
+  - [docs/architecture-diagram.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/architecture-diagram.md)
+- **Required Clarifications**:
+  - Clearly distinguish that the active integration today utilizes the Splunk REST API.
+  - Clarify that MCP-ready Splunk app assets (`tools.conf`, `tool_input_payload_signatures.json`, `savedsearches.conf`) are included as future-ready integrations.
+  - Explain how these saved searches can map to MCP tools when Splunk MCP Server is deployed.
+  - Explicitly align this with the "Best Use of Splunk MCP Server" bonus track.
+  - Do not claim a live, fully-functional Splunk MCP Server integration exists in the demo if it is not actually implemented.
+
+### Phase 4D: Optional MCP Decision Gate (P2)
+- **Goal**: Establish a clear gate for setting up a live Splunk MCP Server.
+- **Gate Conditions**:
+  - Evaluate setup complexity: Only attempt if it can be done within a very short, low-risk time box.
+  - Skip setup if it is time-consuming or risky to the existing demo workspace.
+  - If skipped, document the configuration requirements and design as future-ready.
+
+### Phase 4E: Final QA before Screenshots / Video (P0/P1)
+- **Goal**: Complete validation before recording.
+- **Validation Checklist**:
+  - [ ] P0/P1/P2 priorities are verified and aligned.
+  - [ ] Skip gates for high-risk dependencies are activated.
+  - [ ] AI Gateway is verified optional and handles key omissions and timeouts safely.
+  - [ ] MCP claims are accurate and do not exaggerate functionality.
+  - [ ] AppInspect is documented realistically.
+  - [ ] Ensure screenshots and demo video recording are done only *after* completing these sprint tasks.
+
+### Explicitly Out of Scope / Skipped Items
+- Hosted/Production LLM Models (rely on local run keys or mocks)
+- Database installation
+- Authentication layers
+- Major UI redesign
+- Real destructive response actions (block IP, password resets must remain simulated)
+- Full Splunk SDK agent runtime (use REST API)
+- Private-preview Splunk Agent Builder dependency
+
