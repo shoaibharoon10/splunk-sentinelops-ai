@@ -1,64 +1,100 @@
-# Devpost Description - Splunk SentinelOps AI
+# Devpost Submission — Splunk SentinelOps AI
 
 ## 💡 Inspiration
-Modern Security Operations Centers (SOCs) are overwhelmed. Analysts face thousands of alerts daily. Triaging an incident requires querying indexes, correlating timestamps across multiple log sources (firewall, auth, endpoints), compiling timelines, and figuring out remediation steps. This manual investigation process takes hours. We wanted to build an assistant that bridges the gap between Splunk's industry-leading search indexer and the reasoning capabilities of AI agents—creating a system that investigates alerts, generates SPL, and suggests human-approved response actions in seconds.
+Modern Security Operations Centers (SOCs) are overwhelmed. Analysts face thousands of alerts daily. Triaging a single incident requires querying multiple indexes, correlating timestamps across diverse log sources (auth, firewall, endpoints), compiling timelines, and deciding on remediation steps. This manual, slow investigation process takes hours—giving threat actors the critical time they need to compromise systems. 
+
+We built **Splunk SentinelOps AI** to bridge the gap between Splunk's industry-leading search indexer and the reasoning capabilities of cooperative AI agent pipelines—creating an assistant that investigates alerts, generates SPL, correlates evidence, and coordinates human-approved responses in seconds.
+
+---
 
 ## ⚙️ What It Does
-**Splunk SentinelOps AI** is an intelligent, human-in-the-loop SOC investigation assistant.
-*   **Security Dashboard**: Shows alert distribution, Splunk Enterprise status, and active AI models.
-*   **Agentic Investigation**: Automatically dispatches a team of 7 AI agents to analyze a suspicious alert.
-*   **SPL Query Generation**: The AI generates precise Splunk search queries, displaying them transparently in the UI.
-*   **Log Correlation & Timeline**: Pulls authentication, process, and network logs from Splunk, mapping them to a clean vertical attack timeline.
-*   **Deterministic Risk Scoring**: Calculates an explainable risk score (0-100) based on clear factor rules.
-*   **Human-in-the-Loop Safety**: Suggests response recommendations (like blocking IPs or resetting credentials) which remain pending until explicitly approved by a human analyst.
-*   **Exportable incident report**: Outputs Markdown reports containing all SPL queries, raw log evidence, timelines, and approval records.
+**Splunk SentinelOps AI** is an intelligent, human-in-the-loop SOC triage and investigation assistant.
+*   **Security Command Center**: Shows threat severity distributions, active AI gateways, and Splunk Enterprise diagnostics.
+*   **Agentic Investigation**: Dispatches a cooperative team of 7 AI agents (Alert Parser, SPL Planner, Evidence Collector, Risk Scorer, Timeline Builder, Recommendation Agent, and Report Writer) to triage incoming threats.
+*   **Transparent SPL Generation**: Displays the exact generated Splunk Search Language (SPL) queries directly in the UI.
+*   **Vertical Threat Timeline**: Merges authentication logs, process commands, and egress network bytes into a single chronological incident storyboard.
+*   **Rule-Based Risk Scoring**: Calculates a deterministic, rule-based threat risk score (0-100) and displays contributing factors clearly.
+*   **Human-in-the-Loop Remediation**: Suggests response recommendations (like blocking IPs or rotating keys) that remain pending in a simulated queue until explicitly reviewed and approved by an analyst.
+*   **Report Generation**: Compiles the investigations, queries, timelines, and action approvals into a downloadable Markdown report.
+
+---
 
 ## 🛠️ How We Built It
-*   **Frontend**: Next.js 14 App Router, React, Tailwind CSS, TypeScript, and lucide-react icons.
-*   **Backend**: FastAPI, Python, Pydantic (data contract validation), python-dotenv, and requests.
-*   **Splunk Integration**: Real Splunk REST API search job wrapper, paired with local mock CSV data sources for quick developer onboarding and offline demonstration resiliency.
-*   **AI Orchestration**: Pluggable AI gateway with API support for Gemini and OpenAI models.
+*   **Frontend**: Built with **Next.js 14** (App Router), React, Tailwind CSS, TypeScript, and Lucide React icons.
+*   **Backend**: Crafted with **FastAPI** (Python), Pydantic for strict data contracts, Requests, python-dotenv, and Urllib3.
+*   **AI Providers**: Pluggable AI gateway with API support for OpenAI and Google Gemini models, alongside a rule-based Mock AI fallback for zero-dependency local runs.
+*   **Splunk Client**: Developed a robust REST API client that manages the search job life cycle (creating jobs via POST, polling SID completion status, and fetching results). Includes a local mock CSV parser fallback.
+
+---
 
 ## 🔎 How It Uses Splunk
 Splunk is the core source of truth for SentinelOps AI:
-1.  **Alert Source**: The assistant triages alerts generated by Splunk search rules.
-2.  **SPL Query Planner**: The agent generates SPL queries to look up failed authentication attempts, suspicious parent/child processes, and outbound bytes.
-3.  **Search Job Execution**: The backend uses Splunk's REST API (`/services/search/jobs`) to query the data and collect matching events.
-4.  **Mock Resiliency**: For judges or developers without a running Splunk index, the backend parses local Splunk-style CSV tables.
+1.  **Alert Source**: Triages security alerts index tables.
+2.  **SPL Query Planner**: Formulates queries checking custom index tables (e.g. `index=sentinelops`) and filtering by extracted context.
+3.  **Search Job Execution**: Backend initiates search jobs on Splunk Enterprise (`/services/search/jobs?output_mode=json`), polls the SID state (`entry[0].content.isDone`), and collects rows.
+4.  **Field Mapping & Normalization**: Dynamically handles ingestion field overrides (like mapping the original host to `extracted_host` and ingestion hostname to `host`) to ensure query accuracy.
+
+---
 
 ## 🧠 How It Uses AI Agents
-We constructed a pipeline of 7 specialized agents:
+We constructed a sequential cooperative pipeline containing 7 specialized agents:
 1.  **Alert Parser**: Extracts target user, target host, source IP, and timestamps from the alert.
 2.  **SPL Query Planner**: Generates SPL queries tailored to the alert timeline.
-3.  **Evidence Collector**: Dispatches query requests to the Splunk connector and pulls events.
-4.  **Risk Scorer**: Examines logs and applies deterministic rules to update the risk score.
-5.  **Timeline Builder**: Arranges network logs, cmdlines, and log-ins chronologically.
-6.  **Recommendation Agent**: Evaluates threats and suggests specific mitigations.
-7.  **Report Writer**: Drafts an executive markdown summary.
+3.  **Evidence Collector**: Queries the live Splunk index and pulls matching events.
+4.  **Risk Scorer**: Evaluates evidence and applies deterministic rules to calculate threat severity.
+5.  **Timeline Builder**: Arranges log events chronologically.
+6.  **Recommendation Agent**: Suggests response recommendations based on threat factors.
+7.  **Report Writer**: Synthesizes details into an executive Markdown summary.
+
+---
+
+## 🎯 Best Use of Splunk MCP Server (Bonus Target Alignment)
+To align with the Model Context Protocol (MCP) hackathon track, we built **MCP-Ready Splunk App Assets** located in `splunk-app/SplunkSentinelOps/`. 
+*   **Model Context Protocol Readiness**: These assets include configuration mapping templates (`tools.conf` and `tool_input_payload_signatures.json`) that define SentinelOps investigation capabilities as standard MCP tools.
+*   **Splunk MCP Server Integration**: Once deployed through the Splunk MCP Server, these configurations allow third-party AI models and LLM agents to automatically discover, validate, and execute SentinelOps search playbooks using JSON schema payloads.
+*   **Governance & RBAC**: Uses standard Splunk metadata configurations (`default.meta`) to ensure MCP tool access adheres to roles and access policies.
+
+---
+
+## 🧪 Real Splunk Manual Verification Statement
+We verified the integration against a local **Splunk Enterprise** instance under the following settings:
+*   **Splunk Web Console**: http://localhost:8000
+*   **Splunk REST API Management Port**: https://localhost:8089 (Port 8089, verified basic auth connection)
+*   **Live Index**: `sentinelops`
+*   **Custom Sourcetypes**: `sentinelops:auth`, `sentinelops:endpoint`, `sentinelops:firewall`, `sentinelops:web`
+*   **Status Connection Endpoint (`GET /splunk/status`)**: Returned `connected=true`, `mode=real`, `configured=true`, and `auth_method=Basic`.
+*   **Pipeline Run (`POST /investigate`)**: Successfully processed `alert-001` in real mode, returning a risk score of `100` (Critical), mapping real Splunk rows to evidence cards, and outputting the chronological incident timeline.
+
+---
+
+## 🛡️ Human-in-the-Loop Safety Statement
+Safety is a core constraint in critical security sectors. SentinelOps AI enforces a strict **Human-in-the-Loop (HITL)** safety model:
+*   **No Autopilot Mitigations**: The AI agents are restricted from directly triggering destructive API commands (like resetting passwords or blocking traffic) in target infrastructure.
+*   **Analyst Verification**: Mitigation actions are queued in a pending state on the UI dashboard. They require an analyst's explicit review and approval.
+*   **Auditing**: All approved and rejected response actions are stamped with analyst decisions and logged inside the final report.
+
+---
 
 ## 💥 Challenges We Faced
-*   **Splunk Search Job Latency**: Splunk search jobs are asynchronous, requiring us to implement a clean polling queue in FastAPI to wait for search jobs to complete before collecting logs.
-*   **Ensuring LLM Schema Consistency**: Forcing AI to respond in raw text led to frontend parsing failures. We solved this by implementing strict Pydantic JSON schemas.
-*   **Zero-Dependency Setup**: Making sure the app works without API keys or Splunk running locally required building a comprehensive mock mode for both components.
+*   **Asynchronous Splunk Searching**: Search jobs on Splunk are asynchronous. We solved this by developing a polling loop in our backend client that queries the job SID status before calling results.
+*   **Field Ingestion Differences**: Uploading CSV files to Splunk automatically maps the CSV host header to the `extracted_host` field. We fixed this by modifying our generated SPL queries to check `(extracted_host="{host}" OR host="{host}")` and normalizing keys in our evidence collector.
+*   **Zero-Dependency Resilience**: Building the application so it works out-of-the-box for judges required implementing fallback mock modes for both Splunk data retrieval and AI provider text generation.
+
+---
 
 ## 🎉 Accomplishments That We're Proud Of
-*   Building a clean, professional dark-themed dashboard that feels like a premium enterprise tool.
-*   Implementing a fully functional, zero-config mock engine that demonstrates the exact brute force -> PowerShell execute -> exfiltration scenario seamlessly.
-*   Creating a robust, pluggable architecture separating agent orchestration from external API dependencies.
+*   Developing a high-fidelity dark-themed SOC workspace dashboard.
+*   Constructing a zero-configuration mock mode that simulates the complete brute-force to exfiltration threat storyboard.
+*   Packaging compliant, MCP-ready Splunk App configuration assets to demonstrate Model Context Protocol readiness.
+
+---
 
 ## 📚 What We Learned
-*   **Human-in-the-Loop is Key**: In critical sectors like security, AI should never execute destructive mitigations on its own. Human review build-up is a required design pattern.
-*   **Splunk REST Power**: Splunk's job endpoint is highly flexible and provides clean JSON streams once you configure search job SID polling correctly.
+*   **Security Needs Guardrails**: Autopilot AI is dangerous. Human analyst validation remains a core architecture pattern.
+*   **Splunk REST Versatility**: Splunk's jobs endpoints are highly responsive once auth and search job SID polling loops are properly handled.
+
+---
 
 ## 🚀 What's Next for Splunk SentinelOps AI
-*   **Real Splunk MCP Server Integration**: Build out tools allowing LLMs to directly read Splunk metadata and index metrics via the Model Context Protocol.
-*   **Active SOAR Playbooks**: Connect approved response actions to actual APIs (e.g. Okta, Palo Alto, AWS IAM) to automate the simulated remediation flow.
-
-## 🏷️ Built With
-*   Next.js
-*   Tailwind CSS
-*   TypeScript
-*   FastAPI
-*   Python
-*   Splunk REST API
-*   Gemini API / OpenAI API
+*   **Active SOAR Integration**: Connect approved actions directly to cloud APIs (e.g. AWS IAM, Okta, Palo Alto) to execute active mitigations.
+*   **Advanced Prompt Shielding**: Add prompt injection safety barriers at the Alert Parser level.
