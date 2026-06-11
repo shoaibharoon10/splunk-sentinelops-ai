@@ -49,12 +49,13 @@ We constructed a sequential cooperative pipeline containing 7 specialized agents
 ---
 
 ## 🎯 Best Use of Splunk MCP Server (Bonus Target Alignment)
-To align with the Model Context Protocol (MCP) hackathon track, we built **MCP-Ready Splunk App Assets** located in `splunk-app/SplunkSentinelOps/`. 
-*   **Model Context Protocol Readiness**: These assets include configuration mapping templates (`tools.conf` and `tool_input_payload_signatures.json`) that define SentinelOps investigation capabilities as standard MCP tools.
-*   **Splunk MCP Server Integration**: Once deployed through the Splunk MCP Server, these configurations allow third-party AI models and LLM agents to automatically discover, validate, and execute SentinelOps search playbooks using JSON schema payloads.
-*   **Governance & RBAC**: Uses standard Splunk metadata configurations (`default.meta`) to ensure MCP tool access adheres to roles and access policies.
+To align with the Model Context Protocol (MCP) hackathon track, we built and packaged **MCP-Ready Splunk App Assets** located in `splunk-app/SplunkSentinelOps/`. 
+*   **Active REST API Integration**: The active, live integration in the current demo executes searches directly via the Splunk Enterprise REST API.
+*   **MCP-Ready Blueprint**: We include `tools.conf`, `tool_input_payload_signatures.json`, and `savedsearches.conf` files. Once a **Splunk MCP Server** is deployed in the environment, these assets allow the custom Splunk saved searches to be automatically discovered and exposed as LLM tools.
+*   **Strategic Alignment**: This future-ready design demonstrates how enterprise Splunk search playbooks can be seamlessly integrated into Model Context Protocol runtime environments, perfectly supporting the "Best Use of Splunk MCP Server" bonus story without overclaiming live MCP execution in the demo head.
 
 ---
+
 
 ## 🧪 Real Splunk Manual Verification Statement
 We verified the integration against a local **Splunk Enterprise** instance under the following settings:

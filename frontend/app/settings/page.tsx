@@ -9,6 +9,8 @@ export default function SettingsPage() {
   const [apiBaseUrl, setApiBaseUrl] = useState(process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000");
   const [backendMode, setBackendMode] = useState("mock");
   const [aiMode, setAiMode] = useState("mock");
+  const [aiRawMode, setAiRawMode] = useState("mock");
+  const [aiProviderConfigured, setAiProviderConfigured] = useState(false);
   const [splunkMode, setSplunkMode] = useState("mock");
   const [splunkServer, setSplunkServer] = useState("localhost:8089");
   const [indicesStatus, setIndicesStatus] = useState<Record<string, number>>({});
@@ -27,6 +29,8 @@ export default function SettingsPage() {
       const [health, splunk] = await Promise.all([getHealth(), getSplunkStatus()]);
       setBackendMode(health.mode);
       setAiMode(health.ai_provider);
+      setAiRawMode(health.ai_mode);
+      setAiProviderConfigured(!!health.ai_provider_configured);
       setSplunkMode(splunk.mode || (splunk.connected ? "real" : "mock"));
       setSplunkServer(`${splunk.host}:${splunk.port}`);
       setIndicesStatus(splunk.indices || {});
@@ -49,6 +53,8 @@ export default function SettingsPage() {
         if (active) {
           setBackendMode(health.mode);
           setAiMode(health.ai_provider);
+          setAiRawMode(health.ai_mode);
+          setAiProviderConfigured(!!health.ai_provider_configured);
           setSplunkMode(splunk.mode || (splunk.connected ? "real" : "mock"));
           setSplunkServer(`${splunk.host}:${splunk.port}`);
           setIndicesStatus(splunk.indices || {});
@@ -117,9 +123,21 @@ export default function SettingsPage() {
               </span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
-              <span className="text-zinc-400 font-medium">AI Agent Pipeline Provider</span>
+              <span className="text-zinc-400 font-medium">AI Agent Pipeline Status</span>
               <span className="font-mono font-bold text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
                 {aiMode}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+              <span className="text-zinc-400 font-medium">AI Provider Mode (AI_MODE)</span>
+              <span className="font-mono font-bold text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
+                {aiRawMode}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+              <span className="text-zinc-400 font-medium">AI Key Configuration</span>
+              <span className={`font-mono font-bold px-2 py-0.5 rounded border ${aiProviderConfigured ? "text-emerald-400 bg-emerald-950/20 border-emerald-900" : "text-amber-400 bg-amber-950/20 border-amber-900"}`}>
+                {aiProviderConfigured ? "KEYS LOADED" : "KEYS MISSING (MOCK ACTIVE)"}
               </span>
             </div>
             <div className="flex items-center justify-between py-1.5">

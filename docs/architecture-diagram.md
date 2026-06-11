@@ -121,4 +121,5 @@ graph TD
 ### 4. Pluggable Connectors & Resilient Fallbacks
 *   **Splunk Client**: Executes search jobs via `/services/search/jobs` using Username/Password or API Tokens. If Splunk is offline or the mode is set to mock, it falls back to reading static CSV datasets.
 *   **AI Provider Gateway**: Routes language requests to OpenAI or Gemini. If API keys are missing, the system utilizes a rule-based mock AI pipeline to guarantee zero-dependency developer execution.
-*   **MCP-ready App Assets**: Configuration skeleton mapping saved searches to MCP tools for model integration (see [splunk-app/SplunkSentinelOps/](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/)).
+*   **MCP-ready App Assets**: Includes configuration files (`tools.conf`, `tool_input_payload_signatures.json`, and `savedsearches.conf`) that define searches as MCP tools. These are packaged to enable automatic discovery by a future **Splunk MCP Server** deployment, aligning the codebase with the "Best Use of Splunk MCP Server" track while the active demo runs over standard Splunk REST APIs.
+

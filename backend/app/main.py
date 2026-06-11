@@ -54,5 +54,7 @@ def health_check():
         splunk_connected=splunk_status["connected"],
         mcp_active=False,
         ai_provider=ai_client.get_status(),
+        ai_mode=ai_client.provider,
+        ai_provider_configured=ai_client.get_provider_configured(),
         timestamp=datetime.utcnow().isoformat() + "Z"
     )

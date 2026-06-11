@@ -16,6 +16,10 @@ def test_health_check():
     assert data["service"] == "Splunk SentinelOps AI Backend"
     assert data["mode"] == "mock"
     assert data["splunk_connected"] is False
+    assert "ai_mode" in data
+    assert "ai_provider_configured" in data
+    assert data["ai_mode"] == "mock"
+    assert data["ai_provider_configured"] is False
 
 def test_list_alerts():
     response = client.get("/alerts")
@@ -48,6 +52,10 @@ def test_investigate():
     assert len(data["timeline"]) >= 4
     assert data["human_approval_required"] is True
     assert "Incident Investigation Report" in data["report_markdown"]
+    assert "ai_mode" in data
+    assert "ai_provider_configured" in data
+    assert data["ai_mode"] == "mock"
+    assert data["ai_provider_configured"] is False
 
 def test_export_report():
     response = client.post("/export-report", json={"alert_id": "alert-001"})
@@ -101,3 +109,47 @@ def test_splunk_field_mapping_and_normalization():
     row_str_low = format_real_splunk_row("sentinelops:endpoint", row_low, context)
     assert "host=win-dc-01" in row_str_low
     assert "host=ShoaibDESKTOP" not in row_str_low
+
+def test_ai_gateway_fallbacks():
+    # Test OpenAI fallback with key missing
+    from app.services.ai_client import AIClient
+    from app import config
+    
+    # Temporarily set to openai but no key
+    config.AI_PROVIDER = "openai"
+    config.AI_MODE = "openai"
+    config.OPENAI_API_KEY = ""
+    
+    client_test = AIClient()
+    assert client_test.get_status() == "OpenAI (Fallback to Mock - Key Missing)"
+    assert client_test.get_provider_configured() is False
+    
+    explanation = client_test.generate_incident_explanation(
+        alert_title="Suspicious Login",
+        risk_score=95,
+        timeline=[],
+        evidence_count=0
+    )
+    assert "Incident Analysis" in explanation
+    
+    # Test Gemini fallback with key missing
+    config.AI_PROVIDER = "gemini"
+    config.AI_MODE = "gemini"
+    config.GEMINI_API_KEY = ""
+    
+    client_test_gemini = AIClient()
+    assert client_test_gemini.get_status() == "Gemini (Fallback to Mock - Key Missing)"
+    assert client_test_gemini.get_provider_configured() is False
+    
+    explanation_gemini = client_test_gemini.generate_incident_explanation(
+        alert_title="Suspicious Login",
+        risk_score=95,
+        timeline=[],
+        evidence_count=0
+    )
+    assert "Incident Analysis" in explanation_gemini
+    
+    # Revert config
+    config.AI_PROVIDER = "mock"
+    config.AI_MODE = "mock"
+

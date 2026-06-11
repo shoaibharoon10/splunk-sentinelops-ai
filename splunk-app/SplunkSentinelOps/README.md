@@ -38,3 +38,8 @@ The app defines the following five tools:
 
 > [!NOTE]
 > This folder serves as a hackathon-ready MCP tooling configuration blueprint for demonstration and integration purposes. It is not fully certified for Splunkbase, nor does it contain a local Splunk SDK Python agent runtime.
+
+## 4. Best Use of Splunk MCP Server Alignment
+- **Active Demo Integration**: Today, the SentinelOps backend connects to Splunk Enterprise via the standard **Splunk REST API** (using search job execution, polling, and results collection).
+- **Future-Ready MCP Extension**: The assets in this folder (`tools.conf`, `tool_input_payload_signatures.json`, and `savedsearches.conf`) are fully structured so that when a **Splunk MCP Server** is deployed in your ecosystem, it can automatically load these configurations to expose the five security tools directly to any LLM client. This enables modular, server-driven threat-hunting aligned with Splunk's MCP strategy.
+

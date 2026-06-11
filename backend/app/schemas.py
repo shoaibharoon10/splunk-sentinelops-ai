@@ -61,6 +61,8 @@ class InvestigationResponse(BaseModel):
     mode: str
     splunk_status: str
     ai_status: str
+    ai_mode: str
+    ai_provider_configured: bool
 
 class SplunkStatus(BaseModel):
     connected: bool
@@ -87,4 +89,6 @@ class HealthResponse(BaseModel):
     splunk_connected: bool
     mcp_active: bool
     ai_provider: str
+    ai_mode: str
+    ai_provider_configured: bool
     timestamp: str

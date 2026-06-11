@@ -119,7 +119,9 @@ def investigate_alert(req: InvestigationRequest):
         report_markdown=report_markdown,
         mode=splunk_client.mode,
         splunk_status=splunk_connected_str,
-        ai_status=ai_status_str
+        ai_status=ai_status_str,
+        ai_mode=ai_client.provider,
+        ai_provider_configured=ai_client.get_provider_configured()
     )
 
 @router.post("/export-report")

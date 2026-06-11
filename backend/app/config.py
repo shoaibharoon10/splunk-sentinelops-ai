@@ -20,9 +20,13 @@ SPLUNK_SEARCH_TIMEOUT_SECONDS = int(os.getenv("SPLUNK_SEARCH_TIMEOUT_SECONDS", "
 SPLUNK_POLL_INTERVAL_SECONDS = float(os.getenv("SPLUNK_POLL_INTERVAL_SECONDS", "1"))
 
 # AI configurations
-AI_PROVIDER = os.getenv("AI_PROVIDER", "mock").lower()
+AI_MODE = os.getenv("AI_MODE", os.getenv("AI_PROVIDER", "mock")).lower()
+AI_PROVIDER = AI_MODE
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+AI_REQUEST_TIMEOUT_SECONDS = int(os.getenv("AI_REQUEST_TIMEOUT_SECONDS", "20"))
 
 # CORS origins
 CORS_ORIGINS_RAW = os.getenv("BACKEND_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")

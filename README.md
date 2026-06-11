@@ -111,3 +111,29 @@ SentinelOps SPL queries dynamically check both fields to guarantee mock and real
 (extracted_host="win-dc-01" OR host="win-dc-01")
 ```
 The **Evidence Collector** automatically extracts and normalizes the host values (`extracted_host` -> `host`) so that downstream timeline builders and risk scorers remain fully compatible with both mock datasets and real index results.
+
+---
+
+## 🤖 Pluggable AI Gateway (Optional)
+
+The backend features a pluggable AI client that supports local mock summaries, OpenAI (`gpt-4o-mini`), and Google Gemini (`gemini-1.5-flash`) models.
+- **Default (Zero-Config)**: Runs in `AI_MODE=mock` without any API keys or internet requirements, returning structured mock investigations out of the box.
+- **Optional API Engines**: Set `AI_MODE=openai` or `AI_MODE=gemini` and load the respective `OPENAI_API_KEY` or `GEMINI_API_KEY` in `backend/.env`.
+- **Fail-Safe Fallback**: If keys are missing, API calls fail, or requests time out (max 20 seconds), the system automatically falls back to mock summary templates. Risk scoring and response recommendations remain fully deterministic and are never modified by the AI.
+
+---
+
+## 🎯 Model Context Protocol (MCP) & Developer Tools Alignment
+
+SentinelOps AI packages a lightweight Splunk app skeleton to showcase developer tool alignment and Model Context Protocol integration possibilities.
+
+### 1. MCP-Ready Splunk App Configurations
+All configurations are structured in [splunk-app/SplunkSentinelOps/](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/):
+- `default/tools.conf` & `default/tool_input_payload_signatures.json`: Maps threat investigation capabilities as standard MCP tools with strict JSON schema inputs.
+- `default/savedsearches.conf`: Defines the pre-defined security search definitions for target indexes.
+
+Once a **Splunk MCP Server** is deployed in your Splunk environment, these configuration files allow the searches to be automatically registered and exposed to LLM clients as tools. This supports the **Best Use of Splunk MCP Server** bonus track without overclaiming live MCP server execution in the active REST-based demo.
+
+### 2. Developer AppInspect Guidelines
+A developer documentation guide explaining Splunk AppInspect validation constraints, manifest metadata schemas, and Splunkbase listing criteria is located at [docs/appinspect-notes.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/appinspect-notes.md).
+

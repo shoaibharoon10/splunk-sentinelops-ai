@@ -60,6 +60,8 @@ export interface InvestigationResponse {
   mode: string;
   splunk_status: string;
   ai_status: string;
+  ai_mode: string;
+  ai_provider_configured: boolean;
 }
 
 export interface SplunkStatus {
@@ -83,5 +85,7 @@ export interface HealthResponse {
   splunk_connected: boolean;
   mcp_active: boolean;
   ai_provider: string;
+  ai_mode: string;
+  ai_provider_configured: boolean;
   timestamp: string;
 }
