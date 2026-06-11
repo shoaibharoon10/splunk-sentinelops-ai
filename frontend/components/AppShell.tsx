@@ -24,6 +24,7 @@ export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [splunkOnline, setSplunkOnline] = useState<boolean | null>(null);
+  const [splunkMode, setSplunkMode] = useState<string>("mock");
   const [aiProvider, setAiProvider] = useState<string>("Mock AI");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -42,8 +43,10 @@ export default function AppShell({ children }: AppShellProps) {
     try {
       const splunk = await getSplunkStatus();
       setSplunkOnline(splunk.connected);
+      setSplunkMode(splunk.mode || "mock");
     } catch {
       setSplunkOnline(false);
+      setSplunkMode("mock");
     }
     setLoading(false);
   };
@@ -58,6 +61,7 @@ export default function AppShell({ children }: AppShellProps) {
             setBackendOnline(health.status === "healthy");
             setAiProvider(health.ai_provider || "Mock AI");
             setSplunkOnline(splunk.connected);
+            setSplunkMode(splunk.mode || "mock");
             setLoading(false);
           }
         })
@@ -65,6 +69,7 @@ export default function AppShell({ children }: AppShellProps) {
           if (active) {
             setBackendOnline(false);
             setSplunkOnline(false);
+            setSplunkMode("mock");
             setLoading(false);
           }
         });
@@ -194,7 +199,9 @@ export default function AppShell({ children }: AppShellProps) {
 
           {/* Safety disclaimer widget */}
           <div className="text-[9px] text-zinc-500 font-mono border-t border-zinc-800/60 pt-2 text-center select-none leading-relaxed">
-            Hackathon Mock Integration Active
+            {splunkOnline && splunkMode === "real"
+              ? "Splunk REST Integration Active"
+              : "Mock CSV Integration Active"}
           </div>
         </div>
       </aside>
@@ -205,7 +212,9 @@ export default function AppShell({ children }: AppShellProps) {
         <header className="h-14 bg-zinc-900 border-b border-zinc-800 flex-shrink-0 flex items-center justify-between px-8">
           <div className="flex items-center space-x-4">
             <span className="text-xs text-zinc-400 font-semibold font-mono bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800">
-              Environment: Mock-Mode Core
+              {splunkOnline && splunkMode === "real"
+                ? "Environment: Real Splunk REST"
+                : "Environment: Mock Mode"}
             </span>
           </div>
           <div className="flex items-center space-x-3 text-xs">
