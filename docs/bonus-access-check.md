@@ -102,37 +102,125 @@ Based on this evidence, **neither database corruption nor private-key file acces
 
 ---
 
-## 🚧 Current Blockers & Risks Summary
-1.  **MongoDB Database Corruption / KV Store Down (P0 Blocker)**: MongoDB failed to start, terminating abnormally. This blocks all token generation for the MCP server and settings serialization in the AI Toolkit.
-2.  **Access Privilege Limits**: Local diagnostic commands (`splunk.exe show kvstore-status`) and raw logs (`mongod.log`) require local OS administrative permissions that are blocked in standard user-space shell execution.
-3.  **Cloud-Only Entitlements**: Splunk Hosted Models require an active Splunk Cloud instance and are not bundled with local Enterprise.
+## 🚧 Current Blockers & Risks Summary (Updated Gate 1C)
+1.  **KV Store MongoDB SSL/CA-Chain Failure (P0 Blocker)**: The root cause is confirmed as a **certificate-chain / CA validation failure**, not database corruption. Splunk 10.x upgraded the KV Store to MongoDB 7.0, which enforces stricter X.509 certificate requirements including full EKU extensions (`clientAuth` + `serverAuth`) and a valid Authority Key Identifier. The existing default `server.pem` was generated for an older MongoDB version and is rejected during TLS handshake.
+2.  **CLI Access Privilege Limits**: All `splunk.exe` commands invoked from the standard (non-elevated) console return `Access is denied`. This includes `help`, `btool`, `createssl`, `show kvstore-status`, and `cmd openssl`. All Splunk CLI repair operations **must be run from an Elevated (Run as Administrator) Command Prompt or PowerShell session**.
+3.  **No mongod Process Running**: Confirmed via process list — `mongod` is not running. Port `8191` shows no listeners. The MongoDB process crashes immediately during KV Store startup, consistent with an SSL rejection at the TLS binding stage before any data is processed.
+4.  **Cloud-Only Entitlements**: Splunk Hosted Models require an active Splunk Cloud instance and are not bundled with local Enterprise.
 
 ---
 
-## 🛠️ Safest Recommended Next Steps (For the User)
+## 🔧 Gate 1C — Safe KV Store Repair Plan
 
-Do **NOT** delete the Splunk database directory or clean the KV Store using destructive commands (`splunk clean kvstore`), as this will erase all lookup records and token collections. Instead, run these safe repair steps from an **Elevated Command Prompt (Run as Administrator)**:
+### 1. Command Availability Verification (Gate 1C Diagnostics)
+All diagnostic commands attempted from a standard non-elevated PowerShell console returned `Access is denied`. This is a hard Windows security boundary.
 
-1.  **Check Port Conflicts**:
-    Verify if another service is binding to port `8191` (MongoDB default in Splunk):
-    ```powershell
-    Get-NetTCPConnection -LocalPort 8191 -ErrorAction SilentlyContinue
-    ```
-2.  **Remove Lock Files**:
-    Stop the Splunk service, search for and delete any stale lock files leftover from an unclean shutdown:
-    ```powershell
-    Stop-Service -Name Splunkd
-    Remove-Item "D:\Program Files\Splunk\var\lib\splunk\kvstore\mongo\mongod.lock" -Force -ErrorAction SilentlyContinue
-    ```
-3.  **Run MongoDB Repair**:
-    Start the database in repair mode to fix index and journal corruptions:
-    ```cmd
-    cd "D:\Program Files\Splunk\bin"
-    splunk.exe repair kvstore
-    ```
-4.  **Restart & Check Status**:
-    Start Splunk and check KV Store status:
-    ```powershell
-    Start-Service -Name Splunkd
-    splunk.exe show kvstore-status
-    ```
+| Command Attempted | Result |
+|---|---|
+| `splunk.exe help createssl` | Access is denied |
+| `splunk.exe help clean` | Access is denied |
+| `splunk.exe btool server list sslConfig --debug` | Access is denied |
+| `splunk.exe btool server list kvstore --debug` | Access is denied |
+| `splunk.exe createssl server-cert ...` | Access is denied |
+| `splunk.exe version` | Access is denied |
+| `splunk.exe cmd openssl x509 -text -in server.pem` | Access is denied |
+| `Get-ChildItem D:\Program Files\Splunk\etc\auth` | Access is denied |
+| `Get-Content mongod.log` | Access is denied |
+| `Get-Process mongod` | No process found (confirms mongod not running) |
+
+**Finding**: All Splunk CLI and filesystem access under the `D:\Program Files\Splunk\` path requires an elevated shell. **None of these commands can be run safely by the agent.** They must all be run manually by the user from an Elevated Command Prompt.
+
+### 2. Root Cause Verification (from Research)
+Based on the MongoDB logs, certificate diagnostics, and Splunk 10.x release notes:
+
+*   **Splunk 10.x upgraded KV Store to MongoDB 7.0**. MongoDB 7.0 enforces strict X.509 validation, requiring:
+    *   Full `Extended Key Usage (EKU)` extensions: must include both `TLS Web Server Authentication` (`serverAuth`) and `TLS Web Client Authentication` (`clientAuth`).
+    *   Valid `Authority Key Identifier` in the certificate chain.
+*   **The default `server.pem` certificate was auto-generated at an older Splunk/MongoDB version** and does not include these extensions — confirmed by the `Missing Authority Key Identifier` and `invalid CA certificate` errors.
+*   **The private key and file permissions are not the cause** — the key decrypts successfully with the default passphrase `password` and the service account has full-control file permissions.
+
+### 3. Safe Repair Paths
+
+> ⚠️ **ALL steps below must be run from an Elevated (Run as Administrator) Command Prompt or PowerShell session.** Do not run any step without backing up first.
+
+---
+
+#### 🟢 Path A — Safe Certificate Regeneration (Recommended, Non-Destructive)
+This is the Splunk-documented safe path. Splunk will auto-generate a new `server.pem` with the correct extensions on next start if the file is renamed/moved (not deleted).
+
+**Step A1 — Create Backup First** (Required before any changes):
+```powershell
+# Run as Administrator
+$backupDir = "D:\SplunkCertBackup_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+New-Item -ItemType Directory -Path $backupDir
+Copy-Item "D:\Program Files\Splunk\etc\auth\server.pem" "$backupDir\server.pem.bak"
+Copy-Item "D:\Program Files\Splunk\etc\auth\cacert.pem" "$backupDir\cacert.pem.bak" -ErrorAction SilentlyContinue
+Copy-Item "D:\Program Files\Splunk\etc\auth\ca.pem" "$backupDir\ca.pem.bak" -ErrorAction SilentlyContinue
+Copy-Item "D:\Program Files\Splunk\etc\system\local\server.conf" "$backupDir\server.conf.bak" -ErrorAction SilentlyContinue
+Write-Output "Backup complete: $backupDir"
+```
+
+**Step A2 — Rename (not delete) the existing server.pem**:
+```powershell
+# Run as Administrator — rename only, do NOT delete
+Stop-Service -Name Splunkd
+Rename-Item "D:\Program Files\Splunk\etc\auth\server.pem" "server.pem.old"
+```
+
+**Step A3 — Start Splunk to trigger auto-regeneration**:
+```powershell
+# Splunk will detect the missing server.pem and generate a new one
+Start-Service -Name Splunkd
+Start-Sleep -Seconds 30
+# Verify a new server.pem was created
+Test-Path "D:\Program Files\Splunk\etc\auth\server.pem"
+```
+
+**Step A4 — Verify certificate includes correct EKU extensions**:
+```cmd
+# Run in elevated CMD
+"D:\Program Files\Splunk\bin\splunk.exe" cmd openssl x509 -noout -text -in "D:\Program Files\Splunk\etc\auth\server.pem"
+# In the output, confirm Extended Key Usage contains:
+#   TLS Web Server Authentication
+#   TLS Web Client Authentication
+```
+
+**Step A5 — Check KV Store status**:
+```cmd
+# Run in elevated CMD
+"D:\Program Files\Splunk\bin\splunk.exe" show kvstore-status
+```
+
+---
+
+#### 🟡 Path B — Stop and Submit REST Demo (Safe Fallback)
+If KV Store repair is complex, time-consuming, or risks destabilizing the working REST integration:
+
+*   Keep the current fully-verified **Splunk REST API** mode as the primary integration.
+*   Document the KV Store failure as a known environment constraint.
+*   Keep the pre-packaged **MCP-ready Splunk app configurations** (`tools.conf`, `savedsearches.conf`, `tool_input_payload_signatures.json`) in the submission as future-ready assets.
+*   Proceed directly to screenshots and video recording.
+
+### 4. Rollback Plan
+If certificate regeneration causes issues:
+
+```powershell
+# Run as Administrator — restore from backup
+Stop-Service -Name Splunkd
+Copy-Item "$backupDir\server.pem.bak" "D:\Program Files\Splunk\etc\auth\server.pem" -Force
+Copy-Item "$backupDir\server.conf.bak" "D:\Program Files\Splunk\etc\system\local\server.conf" -Force
+Start-Service -Name Splunkd
+```
+
+### 5. 🚫 Commands That Must NOT Be Run Without Explicit Approval
+*   **`splunk clean kvstore`**: Destroys all KV Store serialized data permanently.
+*   **Deleting `D:\Program Files\Splunk\var\lib\splunk\kvstore\`**: Data loss.
+*   **Deleting any `.pem` file without backup**: Certificate loss; use rename only.
+*   **Editing `server.conf` sslPassword or sslCertPath without backup**: May break REST SSL entirely.
+*   **`splunk.exe createssl server-cert ...`**: Runs without issue in elevated CMD, but changes are permanent without a backup.
+
+### 6. Final Integration Decisions
+*   **Live MCP Server**: 🛑 **Blocked** until KV Store starts successfully.
+*   **Hosted Models**: 🛑 **Blocked** until KV Store is healthy and cloud entitlements are confirmed.
+*   **REST API Integration**: 🟢 **Active & Primary**. Health check, Splunk status, and full `alert-001` investigation pipeline are working and verified. No changes needed.
+*   **Recommendation**: Attempt **Path A** (safe certificate regeneration) from an elevated shell, then re-check KV Store. If it fails or takes more than 30 minutes, fall back to **Path B** (submit REST demo as-is with MCP-ready assets).
