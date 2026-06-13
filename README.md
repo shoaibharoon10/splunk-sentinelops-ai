@@ -6,6 +6,21 @@ It bridges the gap between Splunk's industry-leading log indexing capabilities a
 
 ---
 
+## 🔌 Integration Status (Final — Submission)
+
+| Layer | Status | Notes |
+|---|---|---|
+| **Splunk REST API** | 🟢 Live & Verified | Full pipeline runs against local Splunk Enterprise; `risk_score=100 Critical` confirmed |
+| **Splunk MCP Server (Live)** | 🛑 Not Implemented | KV Store (MongoDB) SSL failure blocked token storage and tool discovery; 5 repair attempts exhausted |
+| **Splunk AI Toolkit / Hosted Models** | 🛑 Not Implemented | KV Store failure blocked workspace; cloud entitlement not confirmed |
+| **MCP-Ready App Assets** | 🟡 Included (Future-Ready) | `tools.conf`, `savedsearches.conf`, `tool_input_payload_signatures.json` packaged |
+| **AI Gateway (Mock / OpenAI / Gemini)** | 🟢 Active | Pluggable; automatic mock fallback when keys absent |
+
+> **Default demo mode**: Stable AI mock fallback + real Splunk REST evidence queries.
+> Full technical rationale for MCP/KV Store status recorded in [`docs/bonus-access-check.md`](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/bonus-access-check.md).
+
+
+
 ## 🚀 Key Features
 
 *   **SOC Command Center Dashboard**: A sleek dark-themed workspace presenting threat severity distributions, active AI engines, and Splunk status diagnostics.
@@ -132,8 +147,12 @@ All configurations are structured in [splunk-app/SplunkSentinelOps/](file:///g:/
 - `default/tools.conf` & `default/tool_input_payload_signatures.json`: Maps threat investigation capabilities as standard MCP tools with strict JSON schema inputs.
 - `default/savedsearches.conf`: Defines the pre-defined security search definitions for target indexes.
 
-Once a **Splunk MCP Server** is deployed in your Splunk environment, these configuration files allow the searches to be automatically registered and exposed to LLM clients as tools. This supports the **Best Use of Splunk MCP Server** bonus track without overclaiming live MCP server execution in the active REST-based demo.
+Once a **Splunk MCP Server** is deployed in your Splunk environment, these configuration files allow the searches to be automatically registered and exposed to LLM clients as tools. This supports the **Best Use of Splunk MCP Server** bonus track.
+
+> **Honest Status**: The Splunk MCP Server app (v1.2.0) was installed on the local Splunk Enterprise instance. However, live MCP Server execution could **not** be completed because the local **KV Store (MongoDB) failed due to an SSL certificate chain incompatibility** introduced by the Splunk 10.x → MongoDB 7.0 upgrade. Without a working KV Store, the MCP Server cannot store authentication tokens or register tool configurations. Five controlled repair attempts were made and rolled back safely. The active demo uses the verified **Splunk REST API** integration exclusively. Full diagnostic details: [`docs/bonus-access-check.md`](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/bonus-access-check.md).
 
 ### 2. Developer AppInspect Guidelines
 A developer documentation guide explaining Splunk AppInspect validation constraints, manifest metadata schemas, and Splunkbase listing criteria is located at [docs/appinspect-notes.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/appinspect-notes.md).
+
+
 

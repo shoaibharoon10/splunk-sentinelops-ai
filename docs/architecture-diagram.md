@@ -123,3 +123,6 @@ graph TD
 *   **AI Provider Gateway**: Routes language requests to OpenAI or Gemini. If API keys are missing, the system utilizes a rule-based mock AI pipeline to guarantee zero-dependency developer execution.
 *   **MCP-ready App Assets**: Includes configuration files (`tools.conf`, `tool_input_payload_signatures.json`, and `savedsearches.conf`) that define searches as MCP tools. These are packaged to enable automatic discovery by a future **Splunk MCP Server** deployment, aligning the codebase with the "Best Use of Splunk MCP Server" track while the active demo runs over standard Splunk REST APIs.
 
+> **KV Store / MCP Status (Final)**: The Splunk MCP Server app (v1.2.0) was installed but live MCP execution was blocked because the local KV Store (MongoDB) remained failed after 5 controlled SSL certificate repair attempts. The KV Store failure is caused by the Splunk 10.x upgrade to MongoDB 7.0, which enforces stricter X.509 EKU requirements than the default `server.pem` certificate provides. Splunkd was restored and is running; all REST endpoints are verified. The `MCP` subgraph in the diagram above represents **future-ready** assets, not a live integration in the current demo.
+
+

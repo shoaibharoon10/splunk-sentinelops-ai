@@ -224,3 +224,38 @@ Start-Service -Name Splunkd
 *   **Hosted Models**: 🛑 **Blocked** until KV Store is healthy and cloud entitlements are confirmed.
 *   **REST API Integration**: 🟢 **Active & Primary**. Health check, Splunk status, and full `alert-001` investigation pipeline are working and verified. No changes needed.
 *   **Recommendation**: Attempt **Path A** (safe certificate regeneration) from an elevated shell, then re-check KV Store. If it fails or takes more than 30 minutes, fall back to **Path B** (submit REST demo as-is with MCP-ready assets).
+
+---
+
+## 🏁 Gate 1C — Final Outcome (Post-Rollback)
+
+### KV Store Repair Sprint — Attempts Performed
+A controlled repair sprint was executed following the Gate 1C plan. The following repair attempts were made from an Elevated Administrator shell:
+
+| Attempt | Action | Outcome |
+|---|---|---|
+| 1 | `server.pem` rename → Splunk restart (auto-regeneration) | KV Store still failed |
+| 2 | `sslPassword` refresh in `server.conf` | No change |
+| 3 | CA chain inspection (`openssl verify`) | Confirmed chain remains invalid |
+| 4 | Full cert-chain repair attempt | KV Store still failed |
+| 5 | Rollback — restore original `server.pem` from timestamped backup | Splunkd restored and running |
+
+### Final Status After Rollback
+*   **Splunkd**: ✅ Running (restored from backup)
+*   **Splunk Web**: ✅ Accessible at http://localhost:8000
+*   **Splunk REST API**: ✅ Responding at https://localhost:8089
+*   **KV Store (MongoDB)**: 🛑 **Remains failed** — all 5 repair attempts exhausted without resolution
+*   **Developer License**: ✅ Valid (10GB, expires December 2026)
+*   **REST Integration**: ✅ Fully functional — `GET /splunk/status` returns `connected=true`, `POST /investigate alert-001` returns `risk_score=100 Critical`
+
+### Final Integration Decisions (Locked)
+| Integration | Status | Reason |
+|---|---|---|
+| **Splunk REST API** | 🟢 **Active · Primary · Verified** | All REST endpoints responding; full investigation pipeline verified |
+| **Splunk MCP Server (Live)** | 🛑 **Not implemented** | KV Store failure blocks token storage and tool discovery |
+| **Splunk AI Toolkit / Hosted Models** | 🛑 **Not implemented** | KV Store failure blocks workspace + cloud entitlement not confirmed |
+| **MCP-Ready App Assets** | 🟡 **Included as future-ready** | `tools.conf`, `savedsearches.conf`, `tool_input_payload_signatures.json` present |
+| **AI Gateway (Mock/OpenAI/Gemini)** | 🟢 **Active · Optional** | Pluggable gateway with automatic mock fallback is fully working |
+
+### Submission Path
+**Path B is the final submission path.** The project submits the fully verified Splunk REST API integration as the primary demo, with MCP-ready Splunk App configuration assets included as future-ready/bonus-alignment assets. No live MCP execution or Hosted Model access is claimed.

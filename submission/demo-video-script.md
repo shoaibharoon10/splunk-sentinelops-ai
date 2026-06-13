@@ -89,7 +89,7 @@
 *   **Visual**: Open the VS Code editor showing the `splunk-app/SplunkSentinelOps/` folder.
 *   **Action**: Open `tools.conf` and `tool_input_payload_signatures.json`.
 *   **Voiceover**:
-    > "For model integration, the repository includes MCP-ready Splunk App assets. These configurations define our search playbooks as standard Model Context Protocol tools, enabling external LLMs to run security queries securely."
+    > "For model integration alignment, the repository includes MCP-ready Splunk App configuration assets. These files define our security search playbooks as standard Model Context Protocol tools. While our current demo runs over Splunk's REST API—due to a local KV Store limitation—once a Splunk MCP Server is deployed, these assets enable automatic tool discovery by LLM clients without any additional coding."
 
 ### Scene 15: Outro & Pitch (2:35 - 2:45)
 *   **Visual**: Return to the main dashboard showing the alert status updated to "Resolved".
