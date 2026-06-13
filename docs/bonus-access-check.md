@@ -22,12 +22,63 @@ This report records the diagnostics, environment checks, and access verification
     *   *Failed to start KV Store process*
     *   *KV Store changed status to failed*
     *   *KV Store process terminated abnormally*
-*   **Diagnostics Executed**:
-    *   Attempted to run `D:\Program Files\Splunk\bin\splunk.exe show kvstore-status` and read `D:\Program Files\Splunk\var\log\splunk\mongod.log`.
-    *   *Boundary Constraint*: The agent's shell execution does not run with OS-level elevated/administrator privileges, encountering an `Access is denied` block from Windows file system security.
+*   **MongoDB Logs**: `mongod.log` repeatedly shows:
+    *   `InvalidSSLConfiguration`
+    *   `Could not read private key attached to the selected certificate, ensure it exists and check the private key permissions.`
 *   **Impact on Integrations**:
     *   The KV Store is backed by MongoDB and is the primary storage mechanism for Splunk apps to persist state, tokens, and settings.
     *   **CRITICAL BLOCKER**: If the KV Store is failed, generating or saving an API token in the Splunk MCP Server app will fail, blocking tool discovery. Similarly, the Splunk Machine Learning/AI Toolkit cannot save workspaces, experiments, or configuration settings.
+
+---
+
+## 2B. 🔐 KV Store Certificate Chain Diagnostic Findings
+Recent certificate and security diagnostics provide a clearer picture of why the MongoDB process is failing to bind during start-up.
+
+### 1. Diagnostics Commands and Outputs Checked
+*   **KV Store status query**: `splunk.exe show kvstore-status` returns:
+    *   `status: failed`
+    *   `storageEngine: wiredTiger`
+    *   `port: 8191`
+*   **SSL Configuration Analysis (`btool sslConfig`)**:
+    *   `serverCert = $SPLUNK_HOME\etc\auth\server.pem`
+    *   `caCertFile = $SPLUNK_HOME\etc\auth\cacert.pem`
+    *   `sslPassword` is set in `etc/system/local/server.conf`
+*   **Private Key Readability Test**:
+    *   Command: `splunk.exe cmd openssl rsa -in "D:\Program Files\Splunk\etc\auth\server.pem" -check -noout`
+    *   Passphrase: `password` (Splunk's default system passphrase)
+    *   Output: `RSA key ok`
+*   **File Permissions Analysis**:
+    *   The Splunkd service runs as Windows service account `NT SERVICE\Splunkd`.
+    *   Permissions on `server.pem` show:
+        *   `NT SERVICE\Splunkd:(I)(F)` (Inherited Full Control)
+        *   `BUILTIN\Administrators:(I)(F)` (Inherited Full Control)
+        *   `NT AUTHORITY\SYSTEM:(I)(F)` (Inherited Full Control)
+*   **Certificate validation check**:
+    *   `server.pem` contains a valid private key.
+    *   The private key is encrypted and readable with the default password.
+    *   Certificate purpose is valid: `SSL Client: Yes`, `SSL Server: Yes`.
+    *   **Strict Verification Check Failure**:
+        *   `Missing Authority Key Identifier`
+        *   `invalid CA certificate`
+        *   `server.pem verification failed`
+
+### 2. Likely Root Cause Interpretation
+Based on this evidence, **neither database corruption nor private-key file access/permissions are the root causes**. Instead, the failure is triggered by a **certificate-chain / CA validation error**. MongoDB's strict SSL/TLS handshake verification fails to build or validate the certificate trust chain because the Authority Key Identifier is missing, or because there is a mismatch with the CA file (`cacert.pem`).
+
+### 3. Safe Fix Options (Non-Destructive)
+*   **Option A (Recommended)**: Regenerate Splunk default certificates. Back up existing `.pem` files in `etc/auth/`, run Splunk-supported certificate clean/regenerate commands (or allow Splunk to auto-generate them on restart), and start Splunkd.
+*   **Option B**: Validate and repair the CA chain. Ensure that `cacert.pem` contains the root CA that signed `server.pem` and is referenced correctly in `server.conf`.
+*   **Option C**: Create a complete backup of the `etc/auth/` directory and `etc/system/local/server.conf` configuration file before carrying out any certificate adjustments.
+*   **Option D (Fallback)**: If the KV Store repair is too complex or time-consuming, skip live MCP/Hosted Models integration and submit the current working REST API demo + MCP-ready configurations.
+
+### 4. 🚫 Commands That Must NOT Be Run Without Explicit User Approval
+*   **`splunk clean kvstore`**: Deletes all serialized KV Store states, which can destroy active lookups, token mappings, and AppKeyStore collections.
+*   **Deleting the database folder**: Removing contents of `D:\Program Files\Splunk\var\lib\splunk\kvstore/` directly.
+
+### 5. Current Integration Decisions
+*   **Live MCP Server**: 🛑 **Blocked**. Do not attempt backend live client integrations until the KV Store starts successfully.
+*   **Hosted Models**: 🛑 **Blocked**. Do not attempt backend Hosted Models provider code until the KV Store is healthy and cloud model endpoints are accessible.
+*   **REST API Integration**: 🟢 **Active & Primary**. The existing REST API connection is healthy and verified, returning a Critical risk score on alert-001. All features remain fully operational.
 
 ---
 
