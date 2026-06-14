@@ -63,7 +63,7 @@ Recent certificate and security diagnostics provide a clearer picture of why the
         *   `server.pem verification failed`
 
 ### 2. Likely Root Cause Interpretation
-Based on this evidence, **neither database corruption nor private-key file access/permissions are the root causes**. Instead, the failure is triggered by a **certificate-chain / CA validation error**. MongoDB's strict SSL/TLS handshake verification fails to build or validate the certificate trust chain because the Authority Key Identifier is missing, or because there is a mismatch with the CA file (`cacert.pem`).
+Based on this evidence, **neither database corruption nor private-key file access/permissions are the root causes**. Instead, the failure is triggered by a **local Splunk KV Store certificate-chain / SSL validation issue**. The SSL/TLS handshake fails to build or validate the certificate trust chain — symptoms include a missing Authority Key Identifier and/or a mismatch with the CA file (`cacert.pem`). The precise version-level reason could not be conclusively verified from the agent's non-elevated shell access.
 
 ### 3. Safe Fix Options (Non-Destructive)
 *   **Option A (Recommended)**: Regenerate Splunk default certificates. Back up existing `.pem` files in `etc/auth/`, run Splunk-supported certificate clean/regenerate commands (or allow Splunk to auto-generate them on restart), and start Splunkd.
@@ -103,7 +103,7 @@ Based on this evidence, **neither database corruption nor private-key file acces
 ---
 
 ## 🚧 Current Blockers & Risks Summary (Updated Gate 1C)
-1.  **KV Store MongoDB SSL/CA-Chain Failure (P0 Blocker)**: The root cause is confirmed as a **certificate-chain / CA validation failure**, not database corruption. Splunk 10.x upgraded the KV Store to MongoDB 7.0, which enforces stricter X.509 certificate requirements including full EKU extensions (`clientAuth` + `serverAuth`) and a valid Authority Key Identifier. The existing default `server.pem` was generated for an older MongoDB version and is rejected during TLS handshake.
+1.  **KV Store SSL/CA-Chain Failure (P0 Blocker)**: The most likely root cause is a **local Splunk KV Store certificate-chain / SSL validation issue**, not database corruption. The mongod process crashes before binding port 8191, consistent with a TLS handshake failure. Observed symptoms include `Missing Authority Key Identifier`, `invalid CA certificate`, and `server.pem verification failed` errors in `mongod.log`. The exact version-level cause could not be conclusively confirmed due to Windows elevation restrictions blocking all Splunk CLI diagnostic access.
 2.  **CLI Access Privilege Limits**: All `splunk.exe` commands invoked from the standard (non-elevated) console return `Access is denied`. This includes `help`, `btool`, `createssl`, `show kvstore-status`, and `cmd openssl`. All Splunk CLI repair operations **must be run from an Elevated (Run as Administrator) Command Prompt or PowerShell session**.
 3.  **No mongod Process Running**: Confirmed via process list — `mongod` is not running. Port `8191` shows no listeners. The MongoDB process crashes immediately during KV Store startup, consistent with an SSL rejection at the TLS binding stage before any data is processed.
 4.  **Cloud-Only Entitlements**: Splunk Hosted Models require an active Splunk Cloud instance and are not bundled with local Enterprise.
@@ -130,14 +130,13 @@ All diagnostic commands attempted from a standard non-elevated PowerShell consol
 
 **Finding**: All Splunk CLI and filesystem access under the `D:\Program Files\Splunk\` path requires an elevated shell. **None of these commands can be run safely by the agent.** They must all be run manually by the user from an Elevated Command Prompt.
 
-### 2. Root Cause Verification (from Research)
-Based on the MongoDB logs, certificate diagnostics, and Splunk 10.x release notes:
+### 2. Root Cause Assessment (from Diagnostics)
+Based on the observable `mongod.log` errors and certificate diagnostics:
 
-*   **Splunk 10.x upgraded KV Store to MongoDB 7.0**. MongoDB 7.0 enforces strict X.509 validation, requiring:
-    *   Full `Extended Key Usage (EKU)` extensions: must include both `TLS Web Server Authentication` (`serverAuth`) and `TLS Web Client Authentication` (`clientAuth`).
-    *   Valid `Authority Key Identifier` in the certificate chain.
-*   **The default `server.pem` certificate was auto-generated at an older Splunk/MongoDB version** and does not include these extensions — confirmed by the `Missing Authority Key Identifier` and `invalid CA certificate` errors.
+*   The KV Store failure is a **local Splunk KV Store certificate-chain / SSL validation issue** — the mongod process crashes before it can bind port 8191, consistent with a TLS handshake rejection at startup.
+*   Observed error messages include `Missing Authority Key Identifier`, `invalid CA certificate`, and `server.pem verification failed`.
 *   **The private key and file permissions are not the cause** — the key decrypts successfully with the default passphrase `password` and the service account has full-control file permissions.
+*   The precise version-level reason (e.g. stricter EKU enforcement, CA chain mismatch, or certificate expiry) could not be conclusively verified because all Splunk CLI and filesystem diagnostic commands (`btool`, `cmd openssl`, `Get-ChildItem D:\Program Files\Splunk\etc\auth`) returned `Access is denied` from the non-elevated shell. The assessment is based on log error strings and web research, not direct certificate inspection.
 
 ### 3. Safe Repair Paths
 
