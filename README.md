@@ -1,41 +1,57 @@
 # Splunk SentinelOps AI — SOC Triage Assistant
 
-**Splunk SentinelOps AI** is an intelligent, human-in-the-loop Security Operations Center (SOC) investigation and response assistant built for the Splunk Agentic Ops Hackathon.
+**Splunk SentinelOps AI** is an intelligent, human-in-the-loop Security Operations Center (SOC) investigation and response assistant built for the **Splunk Agentic Ops Hackathon** under the **Security Track**.
 
-It bridges the gap between Splunk's industry-leading log indexing capabilities and the reasoning of AI agent pipelines. It automatically generates search queries (SPL), retrieves evidence from Splunk, maps attack steps to a chronological incident timeline, calculates rule-based risk scores, and drafts executive markdown reports—all while keeping a human analyst in control of response playbooks.
+It bridges the gap between Splunk's industry-leading log indexing capabilities and the reasoning of AI agent pipelines. It automatically parses security alerts, plans and generates Splunk search queries (SPL), retrieves evidence from Splunk, maps attack steps to a chronological incident timeline, calculates rule-based risk scores, and drafts audit-ready incident reports—all while keeping a human analyst in control of response playbooks.
 
 ---
 
-## 🔌 Integration Status (Final — Submission)
+## 🎯 Track Alignment: Security
+
+SentinelOps AI addresses the fundamental bottleneck of modern SOCs: alert fatigue and manual cross-log correlation. It automates log search generation, aggregates multi-source evidence, computes risk scores transparently, and queues mitigation playbooks. It ensures an auditable, explainable threat triage pipeline that drastically lowers Time to Investigate (TTI).
+
+### 🛑 Problem Statement
+Security operations centers (SOCs) are overwhelmed by thousands of security alerts daily. Analysts must manually log into systems, formulate complex Splunk SPL queries, stitch together disparate firewall, login, and command-line execution logs, calculate the severity, and document their findings in reports. This manual process takes hours, leading to high triage delay and allowing active threats to dwell undetected.
+
+### 💡 Value Proposition
+Splunk SentinelOps AI automates the initial 80% of security triage within seconds:
+- **Speeds Triage**: Generates and executes target SPL queries automatically.
+- **Explainable Analysis**: Produces a clear, chronological event timeline and evidence-backed risk score.
+- **Safety First**: Keeps the human analyst in the loop (HITL) for high-risk response actions (e.g. host quarantine, credential rotation).
+- **Audit Ready**: Automatically drafts comprehensive markdown incident reports.
+
+---
+
+## 🔌 Integration Status (Honest Assessment)
 
 | Layer | Status | Notes |
 |---|---|---|
-| **Splunk REST API** | 🟢 Live & Verified | Full pipeline runs against local Splunk Enterprise; `risk_score=100 Critical` confirmed |
-| **Splunk MCP Server (Live)** | 🛑 Not Implemented | Local KV Store certificate-chain / SSL validation issue blocked token storage and tool discovery; 5 repair attempts exhausted |
-| **Splunk AI Toolkit / Hosted Models** | 🛑 Not Implemented | KV Store failure blocked workspace; cloud entitlement not confirmed |
-| **MCP-Ready App Assets** | 🟡 Included (Future-Ready) | `tools.conf`, `savedsearches.conf`, `tool_input_payload_signatures.json` packaged |
-| **AI Gateway (Mock / OpenAI / Gemini)** | 🟢 Active | Pluggable; automatic mock fallback when keys absent |
+| **Splunk Enterprise REST API** | 🟢 Live & Verified | Primary integration path. Executes live search jobs against local Splunk instances; risk calculations match real events (`risk_score=100`, `risk_level=Critical` for main demo). |
+| **AI Gateway (Mock / OpenAI / Gemini)** | 🟢 Live & Pluggable | Default is mock fallback; optional API engines load when keys are provided in backend configuration. |
+| **Splunk MCP Server & App Tooling** | 🟡 Blueprint Only | MCP-ready configurations (`tools.conf`, `tool_input_payload_signatures.json`, `savedsearches.conf`) are packaged as a future-ready blueprint. |
+| **Splunk Hosted Models & AI Service** | 🛑 Not Live | Future work; dependent on Splunk Cloud entitlement. |
 
-> **Default demo mode**: Stable AI mock fallback + real Splunk REST evidence queries.
-> Full technical rationale for MCP/KV Store status recorded in [`docs/bonus-access-check.md`](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/bonus-access-check.md).
+> [!NOTE]
+> **Honest Status / Safe Wording**: The live integration path is Splunk Enterprise REST API. MCP-ready assets are included as a future-ready blueprint, but live MCP execution was not enabled because the local development Splunk KV Store remained blocked by a certificate-chain / SSL validation issue.
 
-
+---
 
 ## 🚀 Key Features
 
-*   **SOC Command Center Dashboard**: A sleek dark-themed workspace presenting threat severity distributions, active AI engines, and Splunk status diagnostics.
-*   **Sequential Agentic Pipeline**: Orchestrates a pipeline of 7 specialized AI security agents (Alert Parser, SPL Planner, Evidence Collector, Risk Scorer, Timeline Builder, Recommendation Agent, and Report Writer).
-*   **Transparent SPL Generation**: Translates high-level alert context into targeted Splunk search queries visible in the UI.
-*   **Chronological Log Correlation**: Correlates auth, endpoint process commands, and firewall egress sockets.
-*   **Explainable Risk Scoring**: Deterministically scores threats (0-100) based on clear evidence-based criteria.
-*   **Human-in-the-Loop (HITL) Guardrails**: High-risk mitigations (such as blocking source IPs or forcing password resets) are queued as pending and only executed upon manual analyst approval.
-*   **Markdown Incident Reports**: Generates downloadable executive write-ups summarizing threat timelines, queries, and remediation audit records.
+*   **Alert Queue**: A structured dashboard to ingest, review, and prioritize pending security alerts.
+*   **Agentic Investigation Workflow**: A cooperative cascade of 7 specialized AI security agents (Alert Parser, SPL Query Planner, Evidence Collector, Risk Scorer, Timeline Builder, Recommendation Agent, and Report Writer).
+*   **Generated SPL Queries**: Transports threat context into precise Splunk SPL search queries visible to the analyst in the workspace.
+*   **Real Splunk REST Evidence Collection**: Direct connection via REST API to pull live authentication, endpoint command-line, and firewall egress logs.
+*   **Evidence-Backed Risk Scoring**: Deterministic, transparent evaluation of risk indicators (e.g., failed logins, admin escalation, PowerShell execution) producing scores up to `100` (Critical) for the main demo alert (`alert-001`).
+*   **Incident Timeline**: Correlates auth failures, command executions, and network volume into a clean, vertical chronological view.
+*   **Human-in-the-Loop (HITL) Recommendations**: Interactively queues playbooks (such as host blocking) requiring explicit analyst approval before recording audit state.
+*   **Markdown Incident Report Export**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
 
 ---
 
 ## ⚙️ Architecture Profile
 
-SentinelOps AI coordinates a multi-agent cascade:
+SentinelOps AI coordinates a multi-agent cascade that maps from alert ingestion to analyst review:
 
 ```mermaid
 graph TD
@@ -53,106 +69,127 @@ graph TD
     Writer --> Report[SOC Investigation Workspace & Report Download]
 ```
 
----
+- **Frontend**: Next.js 16 App Router + Tailwind CSS. Accessible routes include:
+  - `/` — SOC Command Center Dashboard.
+  - `/alerts` — Alert Queue list.
+  - `/alerts/[alertId]` — Detailed interactive triage workspace.
+  - `/settings` — Integration status diagnostics and configuration.
+  - `/about` — Architecture profile and project documentation.
+- **Backend**: FastAPI (Python) exposing modular REST endpoints (`/alerts`, `/investigate`, `/export-report`, `/splunk/status`).
+- **Splunk Indexer**: Connects to the `sentinelops` index via the management REST port `https://localhost:8089`.
+- **AI Gateway**: Configured to run in mock mode by default, with provider-ready support for OpenAI and Google Gemini APIs when keys are active.
 
-## 🛠️ Quick Start (Local Mock Mode)
-
-No API keys or running Splunk instance are required to run in developer mock mode.
-
-### 1. Start the Backend
-Navigate to the `backend` directory, install packages, and launch Uvicorn:
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-### 2. Start the Frontend
-Navigate to the `frontend` directory, install NPM dependencies, and start Next.js:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open `http://localhost:3000` to access the SOC workspace.
+For a detailed diagram breakdown, see [docs/architecture-diagram.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/architecture-diagram.md).
 
 ---
 
-## 🔎 Real Splunk Manual Verification — Completed
+## 🛠️ Installation & Setup
 
-The application has been successfully tested and verified end-to-end against a live **Splunk Enterprise** installation.
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Splunk Enterprise (optional for Mock Mode, required for Real Mode)
 
-### Integration Details
-*   **Splunk Web Console**: http://localhost:8000
-*   **Splunk REST API Management Port**: https://localhost:8089
-*   **Backend Real Mode Endpoint**: http://127.0.0.1:8001
-*   **Frontend Web Dashboard**: http://localhost:3000
-*   **Active Index**: `sentinelops`
-*   **Custom Sourcetypes Indexed**:
-    *   `sentinelops:auth`
-    *   `sentinelops:endpoint`
-    *   `sentinelops:firewall`
-    *   `sentinelops:web`
+### 1. Backend Setup
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Create and configure your environment file (`.env`):
+   ```bash
+   # Copy template
+   cp .env.example .env
+   ```
+4. Start the Uvicorn application on port **8001** (matching the frontend expectations):
+   ```bash
+   uvicorn app.main:app --reload --port 8001
+   ```
 
-### Verified API Outcomes
-
-#### 1. Integration Status Ping (`GET /splunk/status`)
-```json
-{
-  "connected": true,
-  "mode": "real",
-  "configured": true,
-  "index": "sentinelops",
-  "auth_method": "Basic",
-  "message": "Connection verification successful"
-}
-```
-
-#### 2. Root Cause Investigation (`POST /investigate` with `alert-001`)
-Successfully executed real Splunk search jobs, returning:
-*   `alert_id`: `"alert-001"`
-*   `risk_score`: `100` (Evidence-based Critical score)
-*   `risk_level`: `"Critical"`
-*   `generated_spl`: Correctly generated queries containing `extracted_host` checks.
-*   `evidence`: Active evidence cards containing real Splunk log rows.
-*   `timeline`: chronological event points (Brute force login cascade -> Admin access -> PowerShell commands -> Egress socket volume).
-*   `report_markdown`: Fully drafted executive summary with Splunk search audits.
-
-### Field Ingestion Mapping & Fallbacks
-Splunk automatically overrides the default metadata `host` field during CSV upload with the ingestion local machine name (e.g., `ShoaibDESKTOP-I26TI8K`). The original CSV hostname value is indexed in the `extracted_host` field. 
-
-SentinelOps SPL queries dynamically check both fields to guarantee mock and real mode compatibility:
-```spl
-(extracted_host="win-dc-01" OR host="win-dc-01")
-```
-The **Evidence Collector** automatically extracts and normalizes the host values (`extracted_host` -> `host`) so that downstream timeline builders and risk scorers remain fully compatible with both mock datasets and real index results.
+### 2. Frontend Setup
+1. Navigate to the `frontend` directory:
+   ```bash
+   cd frontend
+   ```
+2. Install Node packages:
+   ```bash
+   npm install
+   ```
+3. Configure the local environment variables:
+   ```bash
+   # Create a local .env file
+   # Note: Ensure NEXT_PUBLIC_API_BASE_URL points exactly to the FastAPI backend port
+   echo "NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8001" > .env.local
+   ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🤖 Pluggable AI Gateway (Optional)
+## 📊 Splunk Ingestion & Setup
 
-The backend features a pluggable AI client that supports local mock summaries, OpenAI (`gpt-4o-mini`), and Google Gemini (`gemini-1.5-flash`) models.
-- **Default (Zero-Config)**: Runs in `AI_MODE=mock` without any API keys or internet requirements, returning structured mock investigations out of the box.
-- **Optional API Engines**: Set `AI_MODE=openai` or `AI_MODE=gemini` and load the respective `OPENAI_API_KEY` or `GEMINI_API_KEY` in `backend/.env`.
-- **Fail-Safe Fallback**: If keys are missing, API calls fail, or requests time out (max 20 seconds), the system automatically falls back to mock summary templates. Risk scoring and response recommendations remain fully deterministic and are never modified by the AI.
+To verify real mode execution, index the sample CSV datasets onto your Splunk Enterprise instance.
+
+1. **Splunk Web Console**: Access your console at `http://localhost:8000`.
+2. **REST API Endpoint**: Verify the management port is active at `https://localhost:8089`.
+3. **Index Creation**: Create a new index named `sentinelops` with default settings.
+4. **Data Ingestion**: Import the example files from [demo-data/](file:///g:/DevHack/Splunk_SentinelOps_AI/demo-data/) using the standard Splunk Add Data wizard. Match them to the following custom sourcetypes:
+   - `auth_logs.csv` ➡️ Sourcetype: `sentinelops:auth`
+   - `endpoint_logs.csv` ➡️ Sourcetype: `sentinelops:endpoint`
+   - `firewall_logs.csv` ➡️ Sourcetype: `sentinelops:firewall`
+   - `web_logs.csv` ➡️ Sourcetype: `sentinelops:web`
+5. **Environment Configuration**: Set `SPLUNK_MODE=real` and input your Splunk credentials/token in `backend/.env`.
 
 ---
 
-## 🎯 Model Context Protocol (MCP) & Developer Tools Alignment
+## 📺 Demo Walkthrough (Main Incident Case)
 
-SentinelOps AI packages a lightweight Splunk app skeleton to showcase developer tool alignment and Model Context Protocol integration possibilities.
+Follow these steps to demonstrate the end-to-end flow using the primary test case:
 
-### 1. MCP-Ready Splunk App Configurations
-All configurations are structured in [splunk-app/SplunkSentinelOps/](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/):
-- `default/tools.conf` & `default/tool_input_payload_signatures.json`: Maps threat investigation capabilities as standard MCP tools with strict JSON schema inputs.
-- `default/savedsearches.conf`: Defines the pre-defined security search definitions for target indexes.
+1. **Access the Application**: Open your browser to the Dashboard page at `http://localhost:3000`.
+2. **Navigate to the Queue**: Click **Alerts** or go directly to `/alerts` to view the ingested alert list.
+3. **Select Target Alert**: Locate and click on **`alert-001`** (Brute Force login cascade on target host `win-dc-01`).
+4. **Trigger Investigation**: In the alert workspace, click the **Investigate** button. This invokes the backend FastAPI multi-agent pipeline.
+5. **Review Risk and Evidence**:
+   - Verify the calculated **Risk Score** is **`100`** with a severity of **`Critical`**.
+   - Inspect the **Generated SPL Queries** planned by the agent.
+   - Examine the parsed **Evidence Cards** showing matching login failures, admin escalations, and PowerShell commands queried via Splunk.
+6. **Timeline & HITL**:
+   - Review the vertical chronological **Incident Timeline** demonstrating the attack chain progression.
+   - Inspect the queued mitigation playbook in the **Human-in-the-Loop** panel. Click **Approve** on the "Block Source IP" action to test analyst approval validation.
+7. **Report Export**: Scroll to the report panel and click **Download Markdown Report** to save a local copy of the executive incident report.
 
-Once a **Splunk MCP Server** is deployed in your Splunk environment, these configuration files allow the searches to be automatically registered and exposed to LLM clients as tools. This supports the **Best Use of Splunk MCP Server** bonus track.
+---
 
-> **Honest Status**: The Splunk MCP Server app (v1.2.0) was installed on the local Splunk Enterprise instance. However, live MCP Server execution could **not** be completed because the local **KV Store (MongoDB) failed due to a local Splunk KV Store certificate-chain / SSL validation issue**. Without a working KV Store, the MCP Server cannot store authentication tokens or register tool configurations. Five controlled repair attempts were made and rolled back safely. The active demo uses the verified **Splunk REST API** integration exclusively. Full diagnostic details: [`docs/bonus-access-check.md`](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/bonus-access-check.md).
+## 🔧 Troubleshooting
 
-### 2. Developer AppInspect Guidelines
-A developer documentation guide explaining Splunk AppInspect validation constraints, manifest metadata schemas, and Splunkbase listing criteria is located at [docs/appinspect-notes.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/appinspect-notes.md).
+### 404 Pages or Stale Routes
+* **Symptom**: Navigating to `/alerts` or `/alerts/[alertId]` displays a Next.js 404 page.
+* **Resolution**: 
+  1. Terminate the Next.js process (`Ctrl + C` in the frontend terminal).
+  2. Delete the `.next` build folder inside the `frontend` directory: `rmdir /s /q .next` (on Windows/PowerShell) or `rm -rf .next` (on Unix).
+  3. Restart the server with `npm run dev`. On Windows, the Next.js route table cache can occasionally get out of sync with new dynamic folders.
 
+### API Connection Failures
+* **Symptom**: Dashboard displays offline status badges, or investigations fail to run.
+* **Resolution**: 
+  1. Confirm that the FastAPI backend is running on port **8001** (`uvicorn app.main:app --reload --port 8001`).
+  2. Verify that `NEXT_PUBLIC_API_BASE_URL` in `frontend/.env.local` is set to exactly `http://127.0.0.1:8001`.
+  3. Inspect your backend logs for any port conflicts or CORS issues.
 
+---
 
+## 📜 Repository Information & Requirements
+- **License**: Released under the open-source [MIT License](file:///g:/DevHack/Splunk_SentinelOps_AI/LICENSE).
+- **Architecture Diagram**: Refer to [docs/architecture-diagram.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/architecture-diagram.md) for structural blueprints.
+- **Dependencies**: All key dependencies are listed in `backend/requirements.txt` (FastAPI, uvicorn, requests, pandas, pytest, etc.) and `frontend/package.json` (Next.js, lucide-react, react, tailwindcss, etc.).
+- **Example Data & Configurations**:
+  - Sample ingestion files: [demo-data/](file:///g:/DevHack/Splunk_SentinelOps_AI/demo-data/)
+  - Environment variable templates: `backend/.env.example` and `frontend/.env.example`
+  - Splunk configuration manifests: [splunk-app/SplunkSentinelOps/](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/)
