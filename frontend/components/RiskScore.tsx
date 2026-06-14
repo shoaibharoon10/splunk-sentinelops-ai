@@ -87,7 +87,7 @@ export default function RiskScore({ score, level, factors }: RiskScoreProps) {
       {/* Factors details */}
       <div className="space-y-3 flex-grow">
         <h4 className="text-zinc-300 font-bold text-xs tracking-wider uppercase">
-          Threat Vector Assessment
+          Evidence-backed Risk Score
         </h4>
         {factors && factors.length > 0 ? (
           <ul className="space-y-2">

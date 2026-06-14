@@ -225,10 +225,18 @@ export default function InvestigationPage() {
               <h2 className="text-md font-bold text-zinc-100">{investigation.title}</h2>
             </div>
           </div>
-          <div className="flex items-center space-x-3 text-xs">
-            <span className="px-2.5 py-1 bg-zinc-900 rounded border border-zinc-800 text-zinc-400 font-mono text-[10px]">
-              Triage Mode: {investigation.mode}
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono">
+            <span className="px-2 py-1 bg-zinc-900 rounded border border-zinc-800 text-zinc-400">
+              Live Splunk REST Evidence
             </span>
+            <span className="px-2 py-1 bg-zinc-900 rounded border border-zinc-800 text-zinc-400">
+              {investigation.ai_status}
+            </span>
+            {investigation.human_approval_required && (
+              <span className="px-2 py-1 bg-amber-950/30 rounded border border-amber-900/50 text-amber-500 font-bold">
+                Human Approval Required
+              </span>
+            )}
           </div>
         </div>
 
