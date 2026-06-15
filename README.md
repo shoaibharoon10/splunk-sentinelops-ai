@@ -45,7 +45,7 @@ Splunk SentinelOps AI automates the initial 80% of security triage within second
 *   **Evidence-Backed Risk Scoring**: Deterministic, transparent evaluation of risk indicators (e.g., failed logins, admin escalation, PowerShell execution) producing scores up to `100` (Critical) for the main demo alert (`alert-001`).
 *   **Incident Timeline**: Correlates auth failures, command executions, and network volume into a clean, vertical chronological view.
 *   **Human-in-the-Loop (HITL) Recommendations**: Interactively queues playbooks (such as host blocking) requiring explicit analyst approval before recording audit state.
-*   **Markdown Incident Report Export**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
+*   **Markdown Incident Report Exp  ort**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
 
 ---
 
