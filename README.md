@@ -27,7 +27,7 @@ Splunk SentinelOps AI automates the initial 80% of security triage within second
 | Layer | Status | Notes |
 |---|---|---|
 | **Splunk Enterprise REST API** | 🟢 Live & Verified | Primary integration path. Executes live search jobs against local Splunk instances; risk calculations match real events (`risk_score=100`, `risk_level=Critical` for main demo). |
-| **AI Gateway (Mock / OpenAI / Gemini)** | 🟢 Live & Pluggable | Default is mock fallback; optional API engines load when keys are provided in backend configuration. |
+| **AI Gateway** | 🟢 Mock Mode Active / Provider-Ready | Mock fallback is active for the stable demo. OpenAI/Gemini provider hooks are supported by the architecture when keys are configured and verified. |
 | **Splunk MCP Server & App Tooling** | 🟡 Blueprint Only | MCP-ready configurations (`tools.conf`, `tool_input_payload_signatures.json`, `savedsearches.conf`) are packaged as a future-ready blueprint. |
 | **Splunk Hosted Models & AI Service** | 🛑 Not Live | Future work; dependent on Splunk Cloud entitlement. |
 
@@ -45,7 +45,7 @@ Splunk SentinelOps AI automates the initial 80% of security triage within second
 *   **Evidence-Backed Risk Scoring**: Deterministic, transparent evaluation of risk indicators (e.g., failed logins, admin escalation, PowerShell execution) producing scores up to `100` (Critical) for the main demo alert (`alert-001`).
 *   **Incident Timeline**: Correlates auth failures, command executions, and network volume into a clean, vertical chronological view.
 *   **Human-in-the-Loop (HITL) Recommendations**: Interactively queues playbooks (such as host blocking) requiring explicit analyst approval before recording audit state.
-*   **Markdown Incident Report Exp  ort**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
+*   **Markdown Incident Report Export**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
 
 ---
 
@@ -79,7 +79,7 @@ graph TD
 - **Splunk Indexer**: Connects to the `sentinelops` index via the management REST port `https://localhost:8089`.
 - **AI Gateway**: Configured to run in mock mode by default, with provider-ready support for OpenAI and Google Gemini APIs when keys are active.
 
-For a detailed diagram breakdown, see [docs/architecture-diagram.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/architecture-diagram.md).
+For a detailed diagram breakdown, see [docs/architecture-diagram.md](docs/architecture-diagram.md).
 
 ---
 
@@ -139,7 +139,7 @@ To verify real mode execution, index the sample CSV datasets onto your Splunk En
 1. **Splunk Web Console**: Access your console at `http://localhost:8000`.
 2. **REST API Endpoint**: Verify the management port is active at `https://localhost:8089`.
 3. **Index Creation**: Create a new index named `sentinelops` with default settings.
-4. **Data Ingestion**: Import the example files from [demo-data/](file:///g:/DevHack/Splunk_SentinelOps_AI/demo-data/) using the standard Splunk Add Data wizard. Match them to the following custom sourcetypes:
+4. **Data Ingestion**: Import the example files from [`demo-data/`](demo-data/) using the standard Splunk Add Data wizard. Match them to the following custom sourcetypes:
    - `auth_logs.csv` ➡️ Sourcetype: `sentinelops:auth`
    - `endpoint_logs.csv` ➡️ Sourcetype: `sentinelops:endpoint`
    - `firewall_logs.csv` ➡️ Sourcetype: `sentinelops:firewall`
@@ -186,10 +186,10 @@ Follow these steps to demonstrate the end-to-end flow using the primary test cas
 ---
 
 ## 📜 Repository Information & Requirements
-- **License**: Released under the open-source [MIT License](file:///g:/DevHack/Splunk_SentinelOps_AI/LICENSE).
-- **Architecture Diagram**: Refer to [docs/architecture-diagram.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/architecture-diagram.md) for structural blueprints.
+- **License**: Released under the open-source [MIT License](LICENSE).
+- **Architecture Diagram**: Refer to [docs/architecture-diagram.md](docs/architecture-diagram.md) for structural blueprints.
 - **Dependencies**: All key dependencies are listed in `backend/requirements.txt` (FastAPI, uvicorn, requests, pandas, pytest, etc.) and `frontend/package.json` (Next.js, lucide-react, react, tailwindcss, etc.).
 - **Example Data & Configurations**:
-  - Sample ingestion files: [demo-data/](file:///g:/DevHack/Splunk_SentinelOps_AI/demo-data/)
+  - Sample ingestion files: [`demo-data/`](demo-data/)
   - Environment variable templates: `backend/.env.example` and `frontend/.env.example`
-  - Splunk configuration manifests: [splunk-app/SplunkSentinelOps/](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/)
+  - Splunk configuration manifests: [`splunk-app/SplunkSentinelOps/`](splunk-app/SplunkSentinelOps/)
