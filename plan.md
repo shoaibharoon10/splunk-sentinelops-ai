@@ -6,7 +6,7 @@ This document establishes the step-by-step implementation plan for **Splunk Sent
 
 ## 1. Technical Architecture Validation
 
-*   **Frontend**: Next.js 14 App Router, TypeScript, and Tailwind CSS. The UI will look like a premium, dark-themed Security Operations Center dashboard.
+*   **Frontend**: Next.js 16 App Router, TypeScript, and Tailwind CSS. The UI will look like a premium, dark-themed Security Operations Center dashboard.
 *   **Backend**: FastAPI, Pydantic, python-dotenv, Requests, and Pandas (for parsing CSV mock logs).
 *   **Splunk Integration**: Real Splunk REST API queries for logs, with a zero-dependency mock mode targeting `sentinelops` index indexes.
 *   **AI Integration**: OpenAI and Gemini support using a pluggable client layer, with deterministic fallbacks when API keys are absent.
@@ -180,7 +180,7 @@ risk_score = min(score, 100)
 *   `npm run build` (in `/frontend`): Verifies Next.js app builds cleanly.
 
 ### Manual Verification
-*   Verify mock mode run: Run app with zero env variables and check if detail page shows the 95 risk timeline.
+*   Verify mock mode run: Run app with zero env variables and check if detail page shows the 100 risk timeline.
 *   Verify Splunk loading: Load CSV files into Splunk Enterprise and confirm queries display search hits in the UI.
 
 ---
@@ -218,7 +218,7 @@ This sprint focuses on high-impact refinements to boost the project's winning po
   ```
 
 ### Phase 4B: Developer Tools / AppInspect Documentation (P1)
-- **Goal**: Create [docs/appinspect-notes.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/appinspect-notes.md) to document developer tool alignment.
+- **Goal**: Create [docs/appinspect-notes.md](docs/appinspect-notes.md) to document developer tool alignment.
 - **Required Content**:
   - Explain that the project includes a lightweight, MCP-ready Splunk app skeleton.
   - Clarify it is a hackathon proof-of-concept, not Splunkbase-certified.
@@ -229,10 +229,10 @@ This sprint focuses on high-impact refinements to boost the project's winning po
 ### Phase 4C: MCP Documentation Polish (P1)
 - **Goal**: Update existing documents to clarify the exact state of live integration versus MCP-ready assets.
 - **Target Files**:
-  - [README.md](file:///g:/DevHack/Splunk_SentinelOps_AI/README.md)
-  - [submission/devpost-description.md](file:///g:/DevHack/Splunk_SentinelOps_AI/submission/devpost-description.md)
-  - [splunk-app/SplunkSentinelOps/README.md](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/README.md)
-  - [docs/architecture-diagram.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/architecture-diagram.md)
+  - [README.md](README.md)
+  - [submission/devpost-description.md](submission/devpost-description.md)
+  - [splunk-app/SplunkSentinelOps/README.md](splunk-app/SplunkSentinelOps/README.md)
+  - [docs/architecture-diagram.md](docs/architecture-diagram.md)
 - **Required Clarifications**:
   - Clearly distinguish that the active integration today utilizes the Splunk REST API.
   - Clarify that MCP-ready Splunk app assets (`tools.conf`, `tool_input_payload_signatures.json`, `savedsearches.conf`) are included as future-ready integrations.

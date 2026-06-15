@@ -68,7 +68,7 @@ For this hackathon timeline, implement Splunk integration in three layers:
 
 ## References
 
-- Feature Spec: [spec.md](file:///g:/DevHack/Splunk_SentinelOps_AI/spec.md)
-- Implementation Plan: [implementation_plan.md](file:///C:/Users/Shoaib%20Haroon/.gemini/antigravity-ide/brain/e9988761-99f4-4f62-a152-1ed51c523def/implementation_plan.md)
+- Feature Spec: [spec.md](../../spec.md)
+- Implementation Plan: [plan.md](../../plan.md)
 - Related ADRs: None
-- Evaluator Evidence: [011-splunk-rest-integration-plan.plan.prompt.md](file:///g:/DevHack/Splunk_SentinelOps_AI/history/prompts/splunk-integration/011-splunk-rest-integration-plan.plan.prompt.md)
+- Evaluator Evidence: [011-splunk-rest-integration-plan.plan.prompt.md](../../history/prompts/splunk-integration/011-splunk-rest-integration-plan.plan.prompt.md)

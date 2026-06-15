@@ -235,7 +235,7 @@ Priority: P0
 Phase: Backend Validation
 Files/Folders:
 * `backend/tests/test_endpoints.py`
-Description: Run pytest verification confirming that endpoints respond with standard schemas, threat scenario returns risk of 95, and fallbacks operate under missing variables.
+Description: Run pytest verification confirming that endpoints respond with standard schemas, threat scenario returns risk of 100, and fallbacks operate under missing variables.
 Acceptance Criteria:
 * Tests run and pass cleanly.
 Dependencies:

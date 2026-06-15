@@ -1,45 +1,89 @@
 # Splunk SentinelOps AI - Demo Story Script
 
-This document details the live demonstration story for the 3-minute submission video of **Splunk SentinelOps AI**.
+This document details the live demonstration story for the submission video of **Splunk SentinelOps AI**.
 
----
-
-## 1. Demo Narrative Breakdown
-
-*   **Target Duration**: 2 minutes 50 seconds
+*   **Target Duration**: Under 3 minutes
+*   **Video Link**: [YouTube Demo Video](https://www.youtube.com/watch?v=yfrEUxkrPWU&t=30s)
 *   **Presenter Role**: Lead Security Analyst
-*   **Objective**: Show how an analyst triages, investigates, and responds to a multi-stage security threat in under 3 minutes using Splunk data and AI.
 
 ---
 
-## 2. Audio & Visual Script
+## ⏱️ Video Timeline & Scene Guide
 
-### Segment 1: The Alert Storm (0:00 - 0:25)
-*   **Visual**: Show the Next.js Dashboard. Point to the "Critical" alert counters and the green status badge indicating connection to Splunk Enterprise.
+### Scene 1: Dashboard + Problem Statement (0:00 - 0:20)
+*   **Visual**: Show the Splunk SentinelOps AI Dashboard landing page.
+*   **Action**: Present the main dashboard view, highlighting the threat landscape.
 *   **Voiceover**:
-    > "In a busy Security Operations Center, analysts are flooded with security alerts, spending hours writing search queries and digging through raw logs. Today, we're introducing **Splunk SentinelOps AI**—an intelligent, human-in-the-loop investigation assistant designed to cut triage time down to seconds. Let's look at this active Critical alert: 'Suspicious Login & Command Execution Cascade'."
+    > "Hi, this is Splunk SentinelOps AI, an agentic SOC investigation assistant built for the Splunk Agentic Ops Hackathon Security track. Security teams face alert fatigue. Analysts must manually search logs, correlate evidence, build timelines, score risk, approve actions, and write incident reports. Splunk SentinelOps AI automates that first investigation workflow using Splunk data."
 
-### Segment 2: Triggering the Agentic Pipeline (0:25 - 0:50)
-*   **Visual**: Click on the alert in the list. On the detail page, point out the metadata cards, then click the **"Investigate with AI"** button. Show the pipeline indicator pulsing as it flows through the 7 backend agents.
+### Scene 2: Splunk REST and Mock AI Status (0:20 - 0:35)
+*   **Visual**: Zoom in on the connection status cards showing backend health and active gateway modes.
+*   **Action**: Hover over the Splunk index connectivity and AI Gateway indicators.
 *   **Voiceover**:
-    > "With one click, our team of AI agents starts querying Splunk. First, the Alert Parser extracts host and user context. Then, the SPL Planner generates targeted search queries, passing them to our Evidence Collector to search our active Splunk indices. The entire pipeline executes in seconds, retrieving raw security events directly."
+    > "Here on the dashboard, the backend is online, the Splunk index is connected, and the live integration path is Splunk Enterprise REST API. For stable local judging and zero-dependency execution, the AI gateway is running in Mock AI Mode. The investigation itself uses real Splunk REST evidence, deterministic risk scoring, and human-in-the-loop remediation."
 
-### Segment 3: Reviewing the Evidence & Timeline (0:50 - 1:40)
-*   **Visual**: Scroll down. Show the **Generated SPL Queries** block, then highlight the **Splunk Evidence Cards** and the vertical **Incident Timeline**.
+### Scene 3: Alert Queue (0:35 - 0:48)
+*   **Visual**: Navigate to the **Alert Queue** page in the sidebar.
+*   **Action**: Point to the alert list, locating `alert-001`.
 *   **Voiceover**:
-    > "Here is our threat timeline. We see a multi-stage brute force attack: four failed login attempts from a external IP, immediately followed by a successful admin login. Moments later, the compromised user executed an encoded PowerShell process. Finally, the firewall registered a massive 1.5 gigabyte outbound data transmission to a suspicious destination. All of these logs were indexed in Splunk, correlation queries were run automatically, and the timeline was built for us instantly."
+    > "Now I will open the Alert Queue. The main demo case is alert zero zero one: a suspicious login and command execution cascade involving the admin user, the host win D C zero one, and the suspicious external IP address, one eighty five dot twenty one dot forty four dot ten."
 
-### Segment 4: Explaining the Risk & HITL Decisions (1:40 - 2:20)
-*   **Visual**: Point to the Risk Gauge showing **95 / Critical** and hover over the list of contributing risk factors. Scroll to the **Human Approval Recommendation Panel**.
+### Scene 4: Alert-001 Triage Workspace (0:48 - 0:55)
+*   **Visual**: Click on `alert-001` to open its dedicated workspace.
+*   **Action**: Navigate to the triage workspace showing metadata and empty results prior to running the agent pipeline.
 *   **Voiceover**:
-    > "Based on this evidence, the Risk Scorer calculates a deterministic risk score of 95, categorizing it as Critical. Underneath, we see AI-suggested response actions. Because safety is non-negotiable, SentinelOps AI uses a human-in-the-loop safety model. High-risk actions—like resetting the admin credentials and blocking the source IP—are simulated here. I will review the reasoning, click 'Approve' to block the IP, and 'Approve' to force password reset."
+    > "I will open the triage workspace and start the investigation."
 
-### Segment 5: Report Export & Summary (2:20 - 2:45)
-*   **Visual**: Click **"Export Incident Report"**. Show the Markdown download starting. Display a quick slide of the system architecture.
+### Scene 5: Investigate with AI (0:55 - 1:10)
+*   **Visual**: Click the green **"Investigate with AI"** button.
+*   **Action**: Show the progress indicator of the agent pipeline executing through Alert Parser, SPL Planner, and Evidence Collector stages.
 *   **Voiceover**:
-    > "With our approval, the mitigations are queued, and the Report Writer generates a comprehensive markdown incident report documenting the timeline, evidence, SPL queries, and approved actions. Under the hood, FastAPI coordinates these agents, connecting directly to Splunk using REST APIs and pluggable LLM wrappers."
+    > "The agentic pipeline now parses the alert, plans Splunk SPL searches, collects evidence from Splunk, calculates risk, builds the timeline, recommends analyst-approved actions, and generates a markdown incident report."
 
-### Segment 6: Outro (2:45 - 3:00)
-*   **Visual**: Return to dashboard. The alert state has updated to 'Resolved' and the risk graph has flattened.
+### Scene 6: Backend Terminal Showing Splunk REST Dispatch/Retrieval (1:10 - 1:20)
+*   **Visual**: Switch to the backend console terminal view.
+*   **Action**: Highlight the live console logging output showing SPL searches dispatched to Splunk REST API and the returned data.
 *   **Voiceover**:
-    > "By combining Splunk's powerful search analytics with the reasoning of agentic workflows and the guardrails of human validation, we turn a multi-hour manual search into a 30-second triage. This is Splunk SentinelOps AI—securing the future, one agent at a time. Thank you."
+    > "On the backend terminal, we can see live Splunk REST searches being dispatched and results being retrieved from the sentinelops index."
+
+### Scene 7: Risk Score 100 Critical (1:20 - 1:30)
+*   **Visual**: Return to the workspace web UI. Scroll to the **Risk Score** circular gauge.
+*   **Action**: Point to the gauge showing **100 / Critical**.
+*   **Voiceover**:
+    > "Now let’s return to the investigation result. The system calculated an evidence-backed risk score of one hundred, marked as Critical."
+
+### Scene 8: Generated SPL Queries (1:30 - 1:40)
+*   **Visual**: Scroll down to the **Generated SPL Queries** code card block.
+*   **Action**: Show the planned search queries tailored to check host and user tables.
+*   **Voiceover**:
+    > "The generated SPL queries are visible, so the analyst can verify exactly how the evidence was collected."
+
+### Scene 9: Evidence Cards (1:40 - 2:05)
+*   **Visual**: Scroll down to the **Evidence Cards** grid.
+*   **Action**: Display the structured cards parsing the raw log details from authentication, process execution, and firewall connections.
+*   **Voiceover**:
+    > "The evidence cards show correlated events from authentication logs, endpoint process logs, and firewall logs. The attack starts with repeated failed logins against the admin account. Then a successful login occurs from the same suspicious IP. After that, the system detects suspicious PowerShell execution, privileged account creation, and high outbound data movement."
+
+### Scene 10: Timeline (2:05 - 2:18)
+*   **Visual**: Scroll down to the vertical interactive **Incident Timeline**.
+*   **Action**: Walk down the chronological milestones of the attack chain.
+*   **Voiceover**:
+    > "The timeline converts these separate logs into a clear attack chain: brute force, successful login, command execution, privilege escalation, and possible data exfiltration."
+
+### Scene 11: Human-in-the-Loop Approval (2:18 - 2:32)
+*   **Visual**: Scroll to the **Remediation Action Panel** at the bottom of the workspace.
+*   **Action**: Click the **Approve** button on the "Block source IP" recommendation card.
+*   **Voiceover**:
+    > "For safety, all high-impact response actions are human-in-the-loop. SentinelOps AI recommends remediation, but the analyst remains in control. I will approve one recommendation to demonstrate the analyst approval workflow."
+
+### Scene 12: Markdown Report (2:32 - 2:42)
+*   **Visual**: Click the **"Export Report"** button to open the markdown report drawer.
+*   **Action**: Review the structured preview of the incident summary, SPL queries, and approved actions.
+*   **Voiceover**:
+    > "Finally, the system generates a markdown incident report with the summary, risk factors, SPL queries, raw evidence, timeline, and containment recommendations."
+
+### Scene 13: Architecture and MCP-ready Note (2:42 - 2:58)
+*   **Visual**: Display the system architecture overview / concluding dashboard status.
+*   **Action**: Point out the final integration architecture.
+*   **Voiceover**:
+    > "The final architecture uses Next.js, FastAPI, and Splunk Enterprise REST API. MCP-ready assets are included as a future-ready blueprint, but live MCP execution was not enabled because the local Splunk KV Store had a certificate-chain validation blocker. Splunk SentinelOps AI helps SOC teams investigate faster, explain risk with evidence, preserve analyst control, and turn raw Splunk data into an actionable incident report."

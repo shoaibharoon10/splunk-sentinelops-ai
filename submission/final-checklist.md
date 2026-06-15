@@ -13,11 +13,11 @@ This checklist verifies all development and submission requirements are satisfie
 - [x] **Clean Working Tree**: Verify that `git status` reports a clean workspace before submission.
 
 ### Code & Execution
-- [x] **Backend Run Check**: Backend starts successfully using `uvicorn app.main:app --reload --port 8000` (or similar commands) and health routes respond.
+- [x] **Backend Run Check**: Backend starts successfully using `uvicorn app.main:app --port 8001` (or similar commands) and health routes respond.
 - [x] **Frontend Run Check**: Next.js dashboard builds without TS/Lint errors and starts on port 3000.
 - [x] **Backend Tests Pass**: `python -m pytest backend/tests/test_endpoints.py` — **10/10 PASSED** ✅ (22.22s, Python 3.14.2, pytest 9.0.3)
 - [x] **Frontend Lint Pass**: `npm run lint` in the `frontend` folder — **PASSED** ✅ (no errors)
-- [x] **Frontend Build Pass**: `npm run build` in the `frontend` folder — **PASSED** ✅ (production bundle optimized)
+- [x] **Frontend Build Pass**: `npm run build` in the `frontend` folder — **PASSED** ✅ (production bundle optimized). *Note: The final demo video validates the working UI flow.*
 - [x] **Pluggable AI Fallback**: The app starts and runs investigations in Mock AI Mode when OpenAI/Gemini keys are absent.
 - [x] **Splunk Fallback**: The app functions in Mock Splunk Mode using the demo CSVs when the real Splunk instance is offline or disabled.
 
@@ -37,7 +37,7 @@ This checklist verifies all development and submission requirements are satisfie
 ### Submission Media & Writeup
 - [x] **Architecture Diagram**: A graphic or Mermaid block representing the Next.js/FastAPI/Splunk/AI flow is displayed in `docs/architecture-diagram.md` and the README.
 - [x] **Devpost Description Complete**: Project description matches requirements (Inspiration, what it does, how we built it, Splunk usage, AI usage, challenges, etc.). Updated with honest MCP/KV Store status.
-- [ ] **Demo Video Recorded**: A video under 3 minutes showing the dashboard, alert selection, agent investigation flow, timeline, risk scoring, and HITL action approval is recorded and ready for upload.
+- [x] **Demo Video Recorded**: Video recorded under 3 minutes is ready. [YouTube Demo Video](https://www.youtube.com/watch?v=yfrEUxkrPWU&t=30s)
 - [ ] **Screenshots Captured**: Necessary screenshot captures are completed according to `submission/screenshots-checklist.md`.
 - [ ] **GitHub Pushed**: All commits are pushed to the remote repository.
 - [ ] **Devpost Submitted**: Form submitted on Devpost before the hackathon deadline.
@@ -54,9 +54,9 @@ The following integration status reflects the **final verified state** of the pr
 | **Splunk MCP Server (Live)** | 🛑 **Not Implemented** | KV Store SSL failure blocked token storage; 5 repair attempts exhausted; rolled back |
 | **Splunk AI Toolkit / Hosted Models** | 🛑 **Not Implemented** | KV Store failure blocked workspace; cloud entitlement not confirmed |
 | **MCP-Ready App Assets** | 🟡 **Included (Future-Ready)** | `tools.conf`, `savedsearches.conf`, `tool_input_payload_signatures.json` in `splunk-app/` |
-| **AI Gateway** | 🟢 **Active (Mock / OpenAI / Gemini)** | Pluggable gateway; mock fallback verified |
+| **AI Gateway** | 🟢 **Mock Mode Active / Provider-Ready** | Pluggable gateway; mock fallback verified |
 
-Full diagnostic history: [`docs/bonus-access-check.md`](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/bonus-access-check.md)
+Full diagnostic history: [docs/bonus-access-check.md](../docs/bonus-access-check.md)
 
 ---
 

@@ -1,38 +1,38 @@
 # Screenshots Checklist — Splunk SentinelOps AI
 
-Use this checklist to capture and organize visual assets for the hackathon submission gallery and demonstration documentation.
+Use this checklist to capture and organize visual assets for the hackathon submission gallery on Devpost.
+
+> [!NOTE]
+> If the local frontend environment becomes unstable or hard to run near the deadline, screenshots may be captured directly from the recorded demo video frames, as the video demonstrates the fully functional project.
 
 ---
 
-## 🖥️ Splunk Web & REST Console
-- [ ] **Splunk Enterprise Search**: Capture the Splunk search page showing the results for search `index=sentinelops` to prove active data indexing.
-- [ ] **Authentication Log Search**: Capture SPL search and events for sourcetype `sentinelops:auth`.
-- [ ] **Endpoint Sysmon Search**: Capture SPL search and events for sourcetype `sentinelops:endpoint` (showing PowerShell commands).
-- [ ] **Firewall Egress Search**: Capture SPL search and events for sourcetype `sentinelops:firewall` (showing large byte-out sockets).
-- [ ] **Status API Payload**: Screenshot the raw JSON output of the connection ping endpoint `http://127.0.0.1:8001/splunk/status` (showing `connected: true` and `mode: "real"`).
+## 🖥️ Devpost Gallery Screenshot Checklist
+
+### 1. Command Center Dashboard
+- [ ] **Dashboard Home**: Show the primary lander with status badges indicating Splunk Ready / REST Active / Mock AI Mode and the active threat counter.
+
+### 2. Alert Queue
+- [ ] **Alert Queue**: Show the listing of alerts with threat levels, specifically highlighting `alert-001`.
+
+### 3. Triage Workspace & Risk Score
+- [ ] **Triage workspace results**: Show `alert-001` details with the calculated **Risk Score of 100 (Critical)**.
+
+### 4. Splunk Integration & Evidence
+- [ ] **Generated SPL Queries & Evidence Cards**: Show the transparent SPL query planner block alongside the parsed Splunk evidence cards.
+
+### 5. Incident Timeline
+- [ ] **Stitched chronological timeline**: Show the vertical attack chain progression from brute-force to data exfiltration.
+
+### 6. Human-in-the-Loop Safeguards
+- [ ] **Remediation Action Panel**: Show the pending analyst response recommendations and approval buttons.
+
+### 7. Executive Report Preview
+- [ ] **Markdown Report Export**: Show the generated markdown incident report preview/drawer.
 
 ---
 
-## 🎨 SentinelOps Web App Dashboard
-- [ ] **Command Center Dashboard**: Capture the main landing dashboard page showing the Critical/High alert counts, the green **API Endpoint: Online** status badge, and the pluggable gateway statuses.
-- [ ] **Alert Queue**: Capture the full queue listing showing all alerts (alert-001 through alert-004) with their respective severities and triage states.
-
----
-
-## 🔎 Investigation Workspace & Agent Output
-- [ ] **Workspace Top Header**: Capture the top of the investigation page for `alert-001` showing the **Environment: Real Splunk REST** status header, the alert details metadata card, and the circular **Risk Score Gauge** (100 / Critical).
-- [ ] **Generated SPL Queries Block**: Capture the section displaying the precise generated Splunk Search Language queries showing the `extracted_host` conditional filters.
-- [ ] **Evidence Cards Grid**: Capture the evidence section showing the parsed log contents returned by Splunk REST.
-- [ ] **Chronological Attack Timeline**: Capture the vertical timeline showing the chronological attack progression nodes (failed login attempts, successful login, PowerShell execution, and firewall egress).
-
----
-
-## 🛡️ Remediation Safety & Executive Reporting
-- [ ] **Human Analyst Approval Panel**: Capture the recommendations section showing the pending actions ("Block source IP" and "Reset compromised admin credentials") with active **Approve** buttons.
-- [ ] **Incident Report Preview**: Capture the modal/drawer displaying the formatted Markdown executive report ready for export.
-
----
-
-## 📂 Developer Code & MCP Assets
-- [ ] **MCP-ready Config Folder**: Capture the editor sidebar displaying the App configuration directory `splunk-app/SplunkSentinelOps/` (specifically showing the `default/tools.conf` file structure).
-- [ ] **Clean Git Workspace**: Screenshot the output of `git status` inside a terminal verifying a clean repository with all verification commits logged.
+## 📂 Optional Diagnostic / Architecture Captures
+- [ ] **Backend Terminal**: (Optional) Show FastAPI logs detailing live Splunk REST search job dispatch and result polling.
+- [ ] **MCP-ready Blueprint**: (Optional) Show the configuration assets structure (`splunk-app/SplunkSentinelOps/`) inside the code editor.
+- [ ] **Splunk Enterprise Search**: (Optional) Show the results of `index=sentinelops` inside the Splunk Web console.

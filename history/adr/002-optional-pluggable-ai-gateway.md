@@ -47,7 +47,7 @@ We will implement a pluggable, optional AI Gateway with the following behavior:
 
 ## References
 
-- Feature Spec: [spec.md](file:///g:/DevHack/Splunk_SentinelOps_AI/spec.md)
-- Implementation Plan: [plan.md](file:///g:/DevHack/Splunk_SentinelOps_AI/plan.md)
-- Related ADRs: [001-splunk-rest-first-mcp-ready-assets.md](file:///g:/DevHack/Splunk_SentinelOps_AI/docs/adr/001-splunk-rest-first-mcp-ready-assets.md)
-- Evaluator Evidence: [019-plan-final-winning-polish-sprint.general.prompt.md](file:///g:/DevHack/Splunk_SentinelOps_AI/history/prompts/general/019-plan-final-winning-polish-sprint.general.prompt.md)
+- Feature Spec: [spec.md](../../spec.md)
+- Implementation Plan: [plan.md](../../plan.md)
+- Related ADRs: [001-splunk-rest-first-mcp-ready-assets.md](001-splunk-rest-first-mcp-ready-assets.md)
+- Evaluator Evidence: [019-plan-final-winning-polish-sprint.general.prompt.md](../prompts/general/019-plan-final-winning-polish-sprint.general.prompt.md)

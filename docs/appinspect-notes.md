@@ -6,7 +6,7 @@ This document provides developer notes regarding the included **Splunk SentinelO
 
 ## 🛠️ Included Splunk App Skeleton
 The project includes a lightweight, pre-configured Splunk App folder located at:
-[splunk-app/SplunkSentinelOps/](file:///g:/DevHack/Splunk_SentinelOps_AI/splunk-app/SplunkSentinelOps/)
+[splunk-app/SplunkSentinelOps/](../splunk-app/SplunkSentinelOps/)
 
 ### Purpose:
 - Package threat analysis hunting templates and standard query definitions.
