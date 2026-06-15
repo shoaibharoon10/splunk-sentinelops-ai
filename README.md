@@ -1,5 +1,7 @@
 # Splunk SentinelOps AI — SOC Triage Assistant
 
+🎥 **Demo Video**: [YouTube Demo Video](https://www.youtube.com/watch?v=yfrEUxkrPWU&t=30s)
+
 **Splunk SentinelOps AI** is an intelligent, human-in-the-loop Security Operations Center (SOC) investigation and response assistant built for the **Splunk Agentic Ops Hackathon** under the **Security Track**.
 
 It bridges the gap between Splunk's industry-leading log indexing capabilities and the reasoning of AI agent pipelines. It automatically parses security alerts, plans and generates Splunk search queries (SPL), retrieves evidence from Splunk, maps attack steps to a chronological incident timeline, calculates rule-based risk scores, and drafts audit-ready incident reports—all while keeping a human analyst in control of response playbooks.
@@ -14,10 +16,10 @@ SentinelOps AI addresses the fundamental bottleneck of modern SOCs: alert fatigu
 Security operations centers (SOCs) are overwhelmed by thousands of security alerts daily. Analysts must manually log into systems, formulate complex Splunk SPL queries, stitch together disparate firewall, login, and command-line execution logs, calculate the severity, and document their findings in reports. This manual process takes hours, leading to high triage delay and allowing active threats to dwell undetected.
 
 ### 💡 Value Proposition
-Splunk SentinelOps AI automates the initial 80% of security triage within seconds:
+Splunk SentinelOps AI accelerates the initial SOC triage workflow, reducing manual triage effort by automating evidence collection, risk scoring, timeline building, and reporting:
 - **Speeds Triage**: Generates and executes target SPL queries automatically.
 - **Explainable Analysis**: Produces a clear, chronological event timeline and evidence-backed risk score.
-- **Safety First**: Keeps the human analyst in the loop (HITL) for high-risk response actions (e.g. host quarantine, credential rotation).
+- **Safety First**: Keeps the human analyst in the loop (HITL) by providing analyst-approved response recommendations (such as IP blocking or credential rotation) as a simulated approval/audit record without executing destructive production commands directly.
 - **Audit Ready**: Automatically drafts comprehensive markdown incident reports.
 
 ---
@@ -32,7 +34,7 @@ Splunk SentinelOps AI automates the initial 80% of security triage within second
 | **Splunk Hosted Models & AI Service** | 🛑 Not Live | Future work; dependent on Splunk Cloud entitlement. |
 
 > [!NOTE]
-> **Honest Status / Safe Wording**: The live integration path is Splunk Enterprise REST API. MCP-ready assets are included as a future-ready blueprint, but live MCP execution was not enabled because the local development Splunk KV Store remained blocked by a certificate-chain / SSL validation issue.
+> **Honest Status / Safe Wording**: The live integration path is Splunk Enterprise REST API. MCP-ready assets are included as a future-ready blueprint, but live MCP execution was not enabled because the local development Splunk KV Store had a certificate-chain validation blocker.
 
 ---
 
@@ -44,7 +46,7 @@ Splunk SentinelOps AI automates the initial 80% of security triage within second
 *   **Real Splunk REST Evidence Collection**: Direct connection via REST API to pull live authentication, endpoint command-line, and firewall egress logs.
 *   **Evidence-Backed Risk Scoring**: Deterministic, transparent evaluation of risk indicators (e.g., failed logins, admin escalation, PowerShell execution) producing scores up to `100` (Critical) for the main demo alert (`alert-001`).
 *   **Incident Timeline**: Correlates auth failures, command executions, and network volume into a clean, vertical chronological view.
-*   **Human-in-the-Loop (HITL) Recommendations**: Interactively queues playbooks (such as host blocking) requiring explicit analyst approval before recording audit state.
+*   **Human-in-the-Loop (HITL) Recommendations**: Interactively queues analyst-approved response recommendations requiring explicit analyst approval before recording audit state.
 *   **Markdown Incident Report Export**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
 
 ---
