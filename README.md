@@ -8,15 +8,18 @@ It bridges the gap between Splunk's industry-leading log indexing capabilities a
 
 ---
 
-## 🎯 Track Alignment: Security
+## Track Alignment: Security
 
 SentinelOps AI addresses the fundamental bottleneck of modern SOCs: alert fatigue and manual cross-log correlation. It automates log search generation, aggregates multi-source evidence, computes risk scores transparently, and queues mitigation playbooks. It ensures an auditable, explainable threat triage pipeline that drastically lowers Time to Investigate (TTI).
 
-### 🛑 Problem Statement
+### Problem Statement
+
 Security operations centers (SOCs) are overwhelmed by thousands of security alerts daily. Analysts must manually log into systems, formulate complex Splunk SPL queries, stitch together disparate firewall, login, and command-line execution logs, calculate the severity, and document their findings in reports. This manual process takes hours, leading to high triage delay and allowing active threats to dwell undetected.
 
-### 💡 Value Proposition
+### Value Proposition
+
 Splunk SentinelOps AI accelerates the initial SOC triage workflow, reducing manual triage effort by automating evidence collection, risk scoring, timeline building, and reporting:
+
 - **Speeds Triage**: Generates and executes target SPL queries automatically.
 - **Explainable Analysis**: Produces a clear, chronological event timeline and evidence-backed risk score.
 - **Safety First**: Keeps the human analyst in the loop (HITL) by providing analyst-approved response recommendations (such as IP blocking or credential rotation) as a simulated approval/audit record without executing destructive production commands directly.
@@ -24,34 +27,34 @@ Splunk SentinelOps AI accelerates the initial SOC triage workflow, reducing manu
 
 ---
 
-## 🔌 Integration Status (Honest Assessment)
+## Integration Status (Honest Assessment)
 
 | Layer | Status | Notes |
-|---|---|---|
-| **Splunk Enterprise REST API** | 🟢 Live & Verified | Primary integration path. Executes live search jobs against local Splunk instances; risk calculations match real events (`risk_score=100`, `risk_level=Critical` for main demo). |
-| **AI Gateway** | 🟢 Mock Mode Active / Provider-Ready | Mock fallback is active for the stable demo. OpenAI/Gemini provider hooks are supported by the architecture when keys are configured and verified. |
-| **Splunk MCP Server & App Tooling** | 🟡 Blueprint Only | MCP-ready configurations (`tools.conf`, `tool_input_payload_signatures.json`, `savedsearches.conf`) are packaged as a future-ready blueprint. |
-| **Splunk Hosted Models & AI Service** | 🛑 Not Live | Future work; dependent on Splunk Cloud entitlement. |
+| ------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Splunk Enterprise REST API**        | Live & Verified                   | Primary integration path. Executes live search jobs against local Splunk instances; risk calculations match real events (`risk_score=100`, `risk_level=Critical` for main demo). |
+| **AI Gateway**                        | Mock Mode Active / Provider-Ready | Mock fallback is active for the stable demo. OpenAI/Gemini provider hooks are supported by the architecture when keys are configured and verified.                               |
+| **Splunk MCP Server & App Tooling**   | Blueprint Only                    | MCP-ready configurations (`tools.conf`, `tool_input_payload_signatures.json`, `savedsearches.conf`) are packaged as a future-ready blueprint.                                    |
+| **Splunk Hosted Models & AI Service** | Not Live                          | Future work; dependent on Splunk Cloud entitlement.                                                                                                                              |
 
 > [!NOTE]
 > **Honest Status / Safe Wording**: The live integration path is Splunk Enterprise REST API. MCP-ready assets are included as a future-ready blueprint, but live MCP execution was not enabled because the local development Splunk KV Store had a certificate-chain validation blocker.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-*   **Alert Queue**: A structured dashboard to ingest, review, and prioritize pending security alerts.
-*   **Agentic Investigation Workflow**: A cooperative cascade of 7 specialized AI security agents (Alert Parser, SPL Query Planner, Evidence Collector, Risk Scorer, Timeline Builder, Recommendation Agent, and Report Writer).
-*   **Generated SPL Queries**: Transports threat context into precise Splunk SPL search queries visible to the analyst in the workspace.
-*   **Real Splunk REST Evidence Collection**: Direct connection via REST API to pull live authentication, endpoint command-line, and firewall egress logs.
-*   **Evidence-Backed Risk Scoring**: Deterministic, transparent evaluation of risk indicators (e.g., failed logins, admin escalation, PowerShell execution) producing scores up to `100` (Critical) for the main demo alert (`alert-001`).
-*   **Incident Timeline**: Correlates auth failures, command executions, and network volume into a clean, vertical chronological view.
-*   **Human-in-the-Loop (HITL) Recommendations**: Interactively queues analyst-approved response recommendations requiring explicit analyst approval before recording audit state.
-*   **Markdown Incident Report Export**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
+* **Alert Queue**: A structured dashboard to ingest, review, and prioritize pending security alerts.
+* **Agentic Investigation Workflow**: A cooperative cascade of 7 specialized AI security agents (Alert Parser, SPL Query Planner, Evidence Collector, Risk Scorer, Timeline Builder, Recommendation Agent, and Report Writer).
+* **Generated SPL Queries**: Transports threat context into precise Splunk SPL search queries visible to the analyst in the workspace.
+* **Real Splunk REST Evidence Collection**: Direct connection via REST API to pull live authentication, endpoint command-line, and firewall egress logs.
+* **Evidence-Backed Risk Scoring**: Deterministic, transparent evaluation of risk indicators (e.g., failed logins, admin escalation, PowerShell execution) producing scores up to `100` (Critical) for the main demo alert (`alert-001`).
+* **Incident Timeline**: Correlates auth failures, command executions, and network volume into a clean, vertical chronological view.
+* **Human-in-the-Loop (HITL) Recommendations**: Interactively queues analyst-approved response recommendations requiring explicit analyst approval before recording audit state.
+* **Markdown Incident Report Export**: One-click download of audit-ready incident reports containing queries, timelines, and action summaries.
 
 ---
 
-## ⚙️ Architecture Profile
+## Architecture Profile
 
 SentinelOps AI coordinates a multi-agent cascade that maps from alert ingestion to analyst review:
 
@@ -85,7 +88,7 @@ For a detailed diagram breakdown, see [docs/architecture-diagram.md](docs/archit
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Python 3.10+
@@ -93,6 +96,7 @@ For a detailed diagram breakdown, see [docs/architecture-diagram.md](docs/archit
 - Splunk Enterprise (optional for Mock Mode, required for Real Mode)
 
 ### 1. Backend Setup
+
 1. Navigate to the `backend` directory:
    ```bash
    cd backend
@@ -112,6 +116,7 @@ For a detailed diagram breakdown, see [docs/architecture-diagram.md](docs/archit
    ```
 
 ### 2. Frontend Setup
+
 1. Navigate to the `frontend` directory:
    ```bash
    cd frontend
@@ -134,7 +139,7 @@ For a detailed diagram breakdown, see [docs/architecture-diagram.md](docs/archit
 
 ---
 
-## 📊 Splunk Ingestion & Setup
+## Splunk Ingestion & Setup
 
 To verify real mode execution, index the sample CSV datasets onto your Splunk Enterprise instance.
 
@@ -150,7 +155,7 @@ To verify real mode execution, index the sample CSV datasets onto your Splunk En
 
 ---
 
-## 📺 Demo Walkthrough (Main Incident Case)
+## Demo Walkthrough
 
 Follow these steps to demonstrate the end-to-end flow using the primary test case:
 
@@ -169,7 +174,7 @@ Follow these steps to demonstrate the end-to-end flow using the primary test cas
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### 404 Pages or Stale Routes
 * **Symptom**: Navigating to `/alerts` or `/alerts/[alertId]` displays a Next.js 404 page.
@@ -187,7 +192,8 @@ Follow these steps to demonstrate the end-to-end flow using the primary test cas
 
 ---
 
-## 📜 Repository Information & Requirements
+## Repository Information & Requirements
+
 - **License**: Released under the open-source [MIT License](LICENSE).
 - **Architecture Diagram**: Refer to [docs/architecture-diagram.md](docs/architecture-diagram.md) for structural blueprints.
 - **Dependencies**: All key dependencies are listed in `backend/requirements.txt` (FastAPI, uvicorn, requests, pandas, pytest, etc.) and `frontend/package.json` (Next.js, lucide-react, react, tailwindcss, etc.).
